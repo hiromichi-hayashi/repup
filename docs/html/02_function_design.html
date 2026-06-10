@@ -144,7 +144,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>BASE-02</td>
 <td>アカウント / 目標設定</td>
-<td><code>/account</code>, <code>/account/goal</code></td>
+<td><code>/account</code></td>
 </tr>
 <tr>
 <td>F01</td>
@@ -225,8 +225,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li><strong>行く頻度の目安</strong>: 週 N 回(リマインド・連続カウントの基準)</li>
 <li><strong>既定の時間帯</strong>: 朝 / 昼 / 夜(朝を既定として提案。強制しない。<a href="01_concept.html">01</a> §4.5)</li>
 </ul>
+<p>アカウント情報と目標設定は<strong>同一の <code>/account</code> リソースにまとめて</strong>扱う(目標設定を別エンドポイントに分けない)。</p>
 <h3 id="3-3-「オンボーディング」の位置づけ">3.3 「オンボーディング」の位置づけ</h3>
-<p>「オンボーディング」は <strong>独立した API ではなく、初回起動時に上記設定を一度通す UI フロー</strong>(画面 SC-02)の呼び名にすぎない。完了は<strong>初回の目標設定保存時にサーバーが <code>onboardedAt</code> を記録</strong>して表現する(専用の完了エンドポイントは持たない)。</p>
+<p>「オンボーディング」は <strong>独立した API ではなく、初回起動時に上記設定を一度通す UI フロー</strong>(画面 SC-02)の呼び名にすぎない。完了は<strong>初回の保存(<code>PATCH /account</code>)時にサーバーが <code>onboardedAt</code> を記録</strong>して表現する(専用の完了エンドポイントは持たない)。</p>
 <h3 id="3-4-エンドポイント">3.4 エンドポイント</h3>
 <table>
 <thead>
@@ -244,12 +245,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>PATCH</td>
 <td><code>/account</code></td>
-<td>アカウント情報(表示名)の更新</td>
-</tr>
-<tr>
-<td>PATCH</td>
-<td><code>/account/goal</code></td>
-<td>目標設定(目的・週回数・既定時間帯)の更新。初回保存時に <code>onboardedAt</code> を記録</td>
+<td>アカウント情報・目標設定の更新(表示名・目的・週回数・既定時間帯)。初回保存時に <code>onboardedAt</code> を記録</td>
 </tr>
 <tr>
 <td>POST</td>

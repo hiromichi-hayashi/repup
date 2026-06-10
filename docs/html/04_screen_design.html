@@ -209,7 +209,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p><strong>目的</strong>: 動機づけの初期設定。初回に目標設定を一度通すだけの画面で、独立した API は持たない(<a href="02_function_design.html">02</a> §3.3)。</p>
 <ul>
 <li>目的の入力/選択 → 週の目標回数 → 既定時間帯(<strong>朝を推奨表示</strong>)→ 通知許可</li>
-<li>完了で目標設定を保存(<code>PATCH /account/goal</code>、サーバーが <code>onboardedAt</code> を記録)し、ホームへ</li>
+<li>完了で設定を保存(<code>PATCH /account</code>、サーバーが <code>onboardedAt</code> を記録)し、ホームへ</li>
 </ul>
 <h3 id="sc-03-サインイン">SC-03 サインイン</h3>
 <ul>
