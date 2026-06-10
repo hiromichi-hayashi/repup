@@ -409,14 +409,65 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="7-f04-報酬・ペナルティ-積み重ねの増減">7. F04 報酬・ペナルティ(積み重ねの増減)</h2>
 <p>記録(F03)に応じて積み重ねが<strong>増える(報酬)/減る(ペナルティ)</strong>。両者は同じ「積み重ね」システムの増減方向であり、<strong>ペナルティは独立機能(旧 F05)としては持たず本機能に内包する</strong>。</p>
 <h3 id="7-1-連続カウント-ストリーク">7.1 連続カウント(ストリーク)</h3>
-<ul>
-<li>直近の RECORDED が<strong>目標頻度の許容範囲内で続いている</strong>回数を「連続」として数える</li>
-<li>「○回連続いけてる!💪」をホームに表示(§04 SC-01)</li>
-<li>SKIPPED または許容範囲超過の空白で連続は途切れて 0 に戻る(ペナルティ側は §7.4)</li>
-</ul>
+<p>RECORDED を 1 回ずつ積み上げる「<strong>来店の連続</strong>」。前回の来店から空きすぎる(<strong>許容ギャップ超過</strong>)か、<strong>SKIPPED を確定</strong>すると 0 に戻る。毎日行く前提は置かず、許容ギャップを「週 N 回」目標から導出して各自のペースに合わせる。</p>
+<h4>許容ギャップ(maxGapDays)</h4>
+<p>連続を維持できる「前回 RECORDED からの最大日数差」。ユーザーの <code>weeklyTarget</code>(週 N 回, 1〜7)から導出する。</p>
+<pre><code>maxGapDays = ceil(7 / weeklyTarget) + 1
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>weeklyTarget</th>
+<th>maxGapDays</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>週1</td>
+<td>8</td>
+</tr>
+<tr>
+<td>週2</td>
+<td>5</td>
+</tr>
+<tr>
+<td>週3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>週4〜6</td>
+<td>3</td>
+</tr>
+<tr>
+<td>週7</td>
+<td>2</td>
+</tr>
+</tbody></table>
 <blockquote>
-<p>連続の単位は「週 N 回」設定に対する充足で判定する(毎日前提にしない)。具体的な閾値は実装時に確定し、本書 §7.1 を更新する。</p>
+<p>gap は 2 つの RECORDED 日の<strong>日数差</strong>(例: 月→水 = 2)。<code>gap ≤ maxGapDays</code> なら連続を継続、超えると途切れる。+1 は「目標ペースより 1 日遅れても切れない」遊び。</p>
 </blockquote>
+<h4>算出(canonical)</h4>
+<p>連続は記録履歴から決まる<strong>導出値</strong>。<code>UserStats.currentStreak / longestStreak</code> にキャッシュし、<strong>Record の確定/取消時</strong>と<strong>日次 cron</strong>(放置による途切れ反映)で再計算する。評価日を <code>today</code> とする。</p>
+<ol>
+<li>最新の確定日(RECORDED / SKIPPED のうち最も新しい日)が <strong>SKIPPED</strong> なら <code>currentStreak = 0</code>(SKIPPED 即リセット)</li>
+<li>最新の <strong>RECORDED</strong> 日を <code>Dlast</code> とする。無ければ <code>0</code></li>
+<li><code>today − Dlast &gt; maxGapDays</code> なら、最新の連続は空きすぎで途切れている → <code>currentStreak = 0</code></li>
+<li>それ以外は <code>Dlast</code> を起点に過去へ遡り、隣接する RECORDED の日数差が <code>maxGapDays</code> 以内である限り 1 ずつ加算。<strong>間に SKIPPED があればそこで打ち切る</strong></li>
+<li><code>longestStreak = max(longestStreak, currentStreak)</code></li>
+</ol>
+<blockquote>
+<p>1 日 1 確定(<a href="03_database_design.html">03</a> §Record の <code>(userId, date)</code> 一意)なので、同日重複は起きない。過去のブランク日を後から RECORDED にした場合も、本算出で連続が再計算される。</p>
+</blockquote>
+<h4>表示(SC-01)</h4>
+<ul>
+<li><code>currentStreak ≥ 1</code>: 「○回連続いけてる!💪」</li>
+<li><code>currentStreak = 0</code>: 連続表示は出さず、「今日から始めよう」等の起点コピー</li>
+</ul>
+<h4>例(weeklyTarget = 3 → maxGapDays = 4)</h4>
+<ul>
+<li>月・水・金に RECORDED → <strong>連続 3</strong>(各 gap = 2 ≤ 4)</li>
+<li>月に RECORDED、その後 6 日空けて RECORDED → gap = 6 &gt; 4 で途切れ、その回が<strong>連続 1</strong></li>
+<li>月・水に RECORDED のあと木に SKIPPED 確定 → <strong>連続 0</strong>(SKIPPED 即リセット)</li>
+</ul>
 <h3 id="7-2-トロフィー">7.2 トロフィー</h3>
 <p>累積記録数・連続記録に応じて <strong>ブロンズ / シルバー / ゴールド</strong> を付与する。</p>
 <table>
@@ -525,10 +576,12 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="9-未確定事項">9. 未確定事項</h2>
 <p>実装着手前に確定し、本書と関連節を更新する。</p>
 <ul>
-<li>連続カウントの許容範囲ロジック(§7.1)</li>
 <li>トロフィーの付与・降格の具体閾値(§7.2 / §7.4)</li>
 <li>ランキング指標の既定(連続 or 期間内記録数)(§8.1)</li>
 </ul>
+<blockquote>
+<p>連続カウント(ストリーク)のロジックは §7.1 で<strong>確定済み</strong>。</p>
+</blockquote>
 
         <nav class="pager"><a href="01_concept.html"><div class="dir">← PREV</div><div class="t">01 コンセプト</div></a><a href="03_database_design.html" class="next"><div class="dir">NEXT →</div><div class="t">03 DB設計</div></a></nav>
       </article>

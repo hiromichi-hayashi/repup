@@ -126,5 +126,5 @@ BASE 環境構築(全テーブル + 認証 BASE-01)
 ## 5. 開発規律
 
 - 設計書を SSoT とし、**実装が設計と食い違ったらコードを直す前に設計書を直す**
-- 未確定事項([02](02_function_design.html) §10 / [05](05_tech_stack.html) §3 / [06](06_notification_design.html) §8)は、着手前に確定して該当節を更新する
+- 未確定事項([02](02_function_design.html) §9 / [05](05_tech_stack.html) §3 / [06](06_notification_design.html) §8)は、着手前に確定して該当節を更新する
 - `main` に直 push しない / git hook を skip しない
