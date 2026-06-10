@@ -376,10 +376,10 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li><strong>BLANK</strong>: 確定前。予定があったが未操作の状態。後から RECORDED / SKIPPED のどちらかに確定できる</li>
 <li><strong>RECORDED</strong>: 記録(内容入力)を完了 → <strong>「行った」</strong>。連続カウント・トロフィーに加算(§F04)</li>
-<li><strong>SKIPPED</strong>: 「行かなかった」を選択 → サボり。連続カウントを途切れさせ、降格評価の対象(§7.4)</li>
+<li><strong>SKIPPED</strong>: 「行かなかった」を選択 → サボり。予定日なら連続カウントを途切れさせる(§7.1 / §7.4)</li>
 </ul>
 <blockquote>
-<p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。降格の評価対象にするかは §7.4 で定義。</p>
+<p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。予定日が BLANK のまま日を終えた場合は <strong>未達</strong> として扱う(§7.1)。</p>
 </blockquote>
 <h3 id="6-3-記録の内容-mvp">6.3 記録の内容(MVP)</h3>
 <ul>
@@ -459,40 +459,65 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>月・水は通い、金を落とした(その日終了まで RECORDED なし)→ 金で途切れ <strong>連続 0</strong>、次に通った予定日から <strong>連続 1</strong></li>
 <li>予定日でない火曜に行って記録 → 連続は変わらず(ボーナス)</li>
 </ul>
-<h3 id="7-2-トロフィー">7.2 トロフィー</h3>
-<p>累積記録数・連続記録に応じて <strong>ブロンズ / シルバー / ゴールド</strong> を付与する。</p>
+<h3 id="7-2-トロフィー-シーズン制ランク">7.2 トロフィー(シーズン制ランク)</h3>
+<p>ゲームのシーズンランクのように、<strong>連続カウントの最高到達でランクが上がり、シーズン中は下がらない</strong>(昇格のみ・降格なし)。シーズン(既定 1 年)が替わるとリセットし、新シーズンを始める。</p>
+<h4>ランク(6 段階)</h4>
+<p>連続(§7.1)の<strong>シーズン内最高値</strong> <code>seasonBestStreak</code> が閾値に達するとそのランクへ昇格する。</p>
 <table>
 <thead>
 <tr>
 <th>ランク</th>
-<th>例(累積/連続の目安)</th>
+<th>必要連続(<code>seasonBestStreak</code>)</th>
 </tr>
 </thead>
 <tbody><tr>
+<td>なし</td>
+<td>0〜1</td>
+</tr>
+<tr>
 <td>ブロンズ</td>
-<td>初回〜継続の入口</td>
+<td>2</td>
 </tr>
 <tr>
 <td>シルバー</td>
-<td>一定の累積 + 連続を達成</td>
+<td>5</td>
 </tr>
 <tr>
 <td>ゴールド</td>
-<td>高い累積 + 長い連続を維持</td>
+<td>10</td>
+</tr>
+<tr>
+<td>プラチナ</td>
+<td>20</td>
+</tr>
+<tr>
+<td>ダイヤ</td>
+<td>35</td>
+</tr>
+<tr>
+<td>マスター</td>
+<td>60</td>
 </tr>
 </tbody></table>
 <blockquote>
-<p>付与の具体閾値は実装時に確定し、表を更新する。降格(ペナルティ)は §7.4。</p>
+<p>閾値は提案値(運用で調整可)。<code>currentRank</code> は <code>seasonBestStreak</code> から導出する派生値。</p>
 </blockquote>
+<h4>シーズン</h4>
+<ul>
+<li>シーズン = <strong>既定 1 年</strong>(カレンダー年)。<code>UserStats.seasonStartedAt</code> で管理(運用で期間変更可)</li>
+<li>連続が伸びるたび <code>seasonBestStreak = max(seasonBestStreak, currentStreak)</code> を更新 → ランクは上がるのみ</li>
+<li>**シーズン境界(年次 cron)**で <code>seasonBestStreak</code> と <code>currentRank</code> をリセットし、終了シーズンの最高ランクを <code>Trophy</code>(履歴)に記録する</li>
+<li>日々の未達による連続リセット(§7.4)は<strong>ランクを下げない</strong>。ランクはあくまでシーズン内ベストで決まる</li>
+</ul>
 <h3 id="7-3-成長グラフ">7.3 成長グラフ</h3>
 <ul>
 <li>記録回数の推移(週次/月次)を可視化し、「自分の成長具合が一目で見える」を満たす</li>
 </ul>
-<h3 id="7-4-ペナルティ-積み重ねの減少">7.4 ペナルティ(積み重ねの減少)</h3>
-<p>サボりに痛みを持たせる。ペナルティは<strong>個人のトロフィー降格に閉じる</strong>(チームへの通知は持たない / 対象外は <a href="01_concept.html">01</a> §7.3)。</p>
+<h3 id="7-4-ペナルティ-連続のリセット">7.4 ペナルティ(連続のリセット)</h3>
+<p>サボりの痛みは<strong>連続カウントのリセットに閉じる</strong>。<strong>トロフィーの降格は行わない</strong>(シーズン制 §7.2。チームへの通知も持たない / 対象外は <a href="01_concept.html">01</a> §7.3)。</p>
 <ul>
 <li><strong>連続カウント途切れ</strong>: 予定日の<strong>未達</strong>(その日終了まで RECORDED なし、または SKIPPED)で連続が 0 に戻る(算出は §7.1)</li>
-<li><strong>トロフィー降格</strong>: サボりが続くと現在ランクが 1 段下がる(ゴールド→シルバー→ブロンズ)。<strong>cron による定期評価</strong>(予定日の未達が続く)で判定。具体条件は実装時に確定し本節を更新</li>
+<li>一度上げたトロフィーランクはシーズン中は下がらない。リセットは<strong>シーズン境界(年次)のみ</strong>(§7.2)</li>
 </ul>
 <h3 id="7-5-エンドポイント">7.5 エンドポイント</h3>
 <table>
@@ -506,12 +531,12 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td>GET</td>
 <td><code>/account/stats</code></td>
-<td>連続カウント・累積回数・現在ランク・推移データ</td>
+<td>連続カウント・シーズン内最高連続・現在ランク・シーズン情報・累積・推移</td>
 </tr>
 <tr>
 <td>GET</td>
 <td><code>/trophies</code></td>
-<td>保有トロフィー一覧と次ランクまでの条件</td>
+<td>現在ランクと次ランクまでの条件 + 過去シーズンの最高ランク履歴</td>
 </tr>
 </tbody></table>
 <hr>
@@ -567,11 +592,11 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="9-未確定事項">9. 未確定事項</h2>
 <p>実装着手前に確定し、本書と関連節を更新する。</p>
 <ul>
-<li>トロフィーの付与・降格の具体閾値(§7.2 / §7.4)</li>
 <li>ランキング指標の既定(連続 or 期間内記録数)(§8.1)</li>
+<li>シーズンの期間と境界(既定 1 年=カレンダー年。リセット日時の扱い)(§7.2)</li>
 </ul>
 <blockquote>
-<p>連続カウント(ストリーク)のロジックは §7.1 で<strong>確定済み</strong>。</p>
+<p>連続カウント(§7.1)・トロフィー(シーズン制ランク, §7.2)のロジックは<strong>確定済み</strong>。トロフィー閾値は提案値で運用調整可。</p>
 </blockquote>
 
         <nav class="pager"><a href="01_concept.html"><div class="dir">← PREV</div><div class="t">01 コンセプト</div></a><a href="03_database_design.html" class="next"><div class="dir">NEXT →</div><div class="t">03 DB設計</div></a></nav>
@@ -606,9 +631,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#6-4-エンドポイント" class="toc-l3">6.4 エンドポイント</a>
 <a href="#7-f04-報酬・ペナルティ-積み重ねの増減" class="toc-l2">7. F04 報酬・ペナルティ(積み重ねの増減)</a>
 <a href="#7-1-連続カウント-ストリーク" class="toc-l3">7.1 連続カウント(ストリーク)</a>
-<a href="#7-2-トロフィー" class="toc-l3">7.2 トロフィー</a>
+<a href="#7-2-トロフィー-シーズン制ランク" class="toc-l3">7.2 トロフィー(シーズン制ランク)</a>
 <a href="#7-3-成長グラフ" class="toc-l3">7.3 成長グラフ</a>
-<a href="#7-4-ペナルティ-積み重ねの減少" class="toc-l3">7.4 ペナルティ(積み重ねの減少)</a>
+<a href="#7-4-ペナルティ-連続のリセット" class="toc-l3">7.4 ペナルティ(連続のリセット)</a>
 <a href="#7-5-エンドポイント" class="toc-l3">7.5 エンドポイント</a>
 <a href="#8-f06-チーム" class="toc-l2">8. F06 チーム</a>
 <a href="#8-1-要件" class="toc-l3">8.1 要件</a>

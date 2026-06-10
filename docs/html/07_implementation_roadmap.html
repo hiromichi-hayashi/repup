@@ -242,17 +242,17 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </thead>
 <tbody><tr>
 <td>連続カウント確定ロジック</td>
-<td>許容範囲判定</td>
+<td>予定日(P1) × 記録(P2)で判定。日次 cron で未達反映</td>
 <td>F04 §7.1</td>
 </tr>
 <tr>
-<td>トロフィー</td>
-<td>付与/降格(閾値確定)</td>
-<td>F04 §7.2 / §7.4</td>
+<td>トロフィー(シーズン制ランク)</td>
+<td>6段階・<strong>昇格のみ</strong>・<code>seasonBestStreak</code> から導出。<strong>年次リセット cron</strong></td>
+<td>F04 §7.2</td>
 </tr>
 <tr>
 <td>成長画面</td>
-<td>グラフ・ランク・次条件</td>
+<td>グラフ・現在ランク・次ランクまで・シーズン残り</td>
 <td>SC-08</td>
 </tr>
 </tbody></table>

@@ -508,25 +508,37 @@ User 1──n NotificationLog
 <td>currentStreak</td>
 <td>int</td>
 <td>default 0</td>
-<td>現在の連続カウント</td>
+<td>現在の連続カウント(未達でリセット)</td>
 </tr>
 <tr>
 <td>longestStreak</td>
 <td>int</td>
 <td>default 0</td>
-<td>最長連続</td>
+<td>全期間の最長連続</td>
+</tr>
+<tr>
+<td>seasonBestStreak</td>
+<td>int</td>
+<td>default 0</td>
+<td>現シーズン内の最高連続(ランク算出の元)</td>
+</tr>
+<tr>
+<td>currentRank</td>
+<td>enum</td>
+<td>default <code>NONE</code></td>
+<td>NONE/BRONZE/SILVER/GOLD/PLATINUM/DIAMOND/MASTER。<code>seasonBestStreak</code> から導出</td>
+</tr>
+<tr>
+<td>seasonStartedAt</td>
+<td>timestamptz</td>
+<td></td>
+<td>現シーズンの開始時刻(既定 1 年)</td>
 </tr>
 <tr>
 <td>totalRecords</td>
 <td>int</td>
 <td>default 0</td>
 <td>累積記録数</td>
-</tr>
-<tr>
-<td>currentRank</td>
-<td>enum</td>
-<td>default <code>NONE</code></td>
-<td>NONE/BRONZE/SILVER/GOLD</td>
 </tr>
 <tr>
 <td>updatedAt</td>
@@ -536,10 +548,10 @@ User 1──n NotificationLog
 </tr>
 </tbody></table>
 <blockquote>
-<p>UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群。</p>
+<p>UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群 + Schedule。ランクは<strong>昇格のみ</strong>、シーズン境界(年次 cron)で <code>seasonBestStreak</code> / <code>currentRank</code> をリセット(<a href="02_function_design.html">02</a> §7.2)。</p>
 </blockquote>
 <h3 id="3-9-trophy-f04">3.9 Trophy(F04)</h3>
-<p>獲得トロフィーの履歴。</p>
+<p><strong>シーズンごとの最高ランク履歴</strong>(過去シーズンの実績)。降格による失効は持たない。</p>
 <table>
 <thead>
 <tr>
@@ -562,24 +574,25 @@ User 1──n NotificationLog
 <td></td>
 </tr>
 <tr>
+<td>season</td>
+<td>text</td>
+<td></td>
+<td>シーズン識別子(例 <code>&quot;2026&quot;</code>)</td>
+</tr>
+<tr>
 <td>rank</td>
 <td>enum</td>
 <td></td>
-<td>BRONZE/SILVER/GOLD</td>
+<td>そのシーズンの最高到達ランク</td>
 </tr>
 <tr>
-<td>awardedAt</td>
+<td>reachedAt</td>
 <td>timestamptz</td>
 <td>default now</td>
-<td>獲得日時</td>
-</tr>
-<tr>
-<td>revokedAt</td>
-<td>timestamptz</td>
-<td>null可</td>
-<td>降格で失効した日時</td>
+<td>そのランクへの到達日時</td>
 </tr>
 </tbody></table>
+<p>制約: <code>(userId, season, rank)</code> で一意(同一シーズン・同一ランクは 1 行)。シーズンの最高ランク = 当該 season の最大 rank。</p>
 <h3 id="3-10-team-f06">3.10 Team(F06)</h3>
 <table>
 <thead>
@@ -717,7 +730,7 @@ User 1──n NotificationLog
 <h2 id="4-prisma-スキーマ-抜粋">4. Prisma スキーマ(抜粋)</h2>
 <pre><code class="language-prisma">enum TimeOfDay { MORNING NOON NIGHT }
 enum RecordStatus { RECORDED SKIPPED }
-enum Rank { NONE BRONZE SILVER GOLD }
+enum Rank { NONE BRONZE SILVER GOLD PLATINUM DIAMOND MASTER }
 enum Role { OWNER MEMBER }
 
 model User {
@@ -783,8 +796,8 @@ model Record {
 </tr>
 <tr>
 <td>Trophy</td>
-<td><code>(userId, awardedAt)</code></td>
-<td>履歴取得</td>
+<td><code>(userId, season)</code></td>
+<td>シーズン実績取得</td>
 </tr>
 </tbody></table>
 

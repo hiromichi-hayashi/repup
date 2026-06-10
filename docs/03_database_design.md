@@ -151,25 +151,29 @@ Expo Push トークン(端末ごと)。
 | カラム | 型 | 制約 | 説明 |
 |---|---|---|---|
 | userId | text | PK, FK→User | |
-| currentStreak | int | default 0 | 現在の連続カウント |
-| longestStreak | int | default 0 | 最長連続 |
+| currentStreak | int | default 0 | 現在の連続カウント(未達でリセット) |
+| longestStreak | int | default 0 | 全期間の最長連続 |
+| seasonBestStreak | int | default 0 | 現シーズン内の最高連続(ランク算出の元) |
+| currentRank | enum | default `NONE` | NONE/BRONZE/SILVER/GOLD/PLATINUM/DIAMOND/MASTER。`seasonBestStreak` から導出 |
+| seasonStartedAt | timestamptz | | 現シーズンの開始時刻(既定 1 年) |
 | totalRecords | int | default 0 | 累積記録数 |
-| currentRank | enum | default `NONE` | NONE/BRONZE/SILVER/GOLD |
 | updatedAt | timestamptz | | |
 
-> UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群。
+> UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群 + Schedule。ランクは**昇格のみ**、シーズン境界(年次 cron)で `seasonBestStreak` / `currentRank` をリセット([02](02_function_design.html) §7.2)。
 
 ### 3.9 Trophy(F04)
 
-獲得トロフィーの履歴。
+**シーズンごとの最高ランク履歴**(過去シーズンの実績)。降格による失効は持たない。
 
 | カラム | 型 | 制約 | 説明 |
 |---|---|---|---|
 | id | text | PK | |
 | userId | text | FK→User | |
-| rank | enum | | BRONZE/SILVER/GOLD |
-| awardedAt | timestamptz | default now | 獲得日時 |
-| revokedAt | timestamptz | null可 | 降格で失効した日時 |
+| season | text | | シーズン識別子(例 `"2026"`) |
+| rank | enum | | そのシーズンの最高到達ランク |
+| reachedAt | timestamptz | default now | そのランクへの到達日時 |
+
+制約: `(userId, season, rank)` で一意(同一シーズン・同一ランクは 1 行)。シーズンの最高ランク = 当該 season の最大 rank。
 
 ### 3.10 Team(F06)
 
@@ -217,7 +221,7 @@ User と Team の中間。進捗共有の単位。
 ```prisma
 enum TimeOfDay { MORNING NOON NIGHT }
 enum RecordStatus { RECORDED SKIPPED }
-enum Rank { NONE BRONZE SILVER GOLD }
+enum Rank { NONE BRONZE SILVER GOLD PLATINUM DIAMOND MASTER }
 enum Role { OWNER MEMBER }
 
 model User {
@@ -265,4 +269,4 @@ model Record {
 | Record | `(userId, date)` unique | 1日1確定・期間取得 |
 | Schedule | `(userId, date)`, `(userId, active)` | 当日対象抽出 |
 | Membership | `(teamId)`, `(userId)` | チーム集計・所属取得 |
-| Trophy | `(userId, awardedAt)` | 履歴取得 |
+| Trophy | `(userId, season)` | シーズン実績取得 |
