@@ -152,7 +152,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p><strong>BASE 完了の定義(DoD)</strong>: DB スキーマ全量が適用済み / 認証が一通り動く(Apple・メール+パスワード・リセット)/ mobile・api 双方がローカル起動し疎通する。
 前提: スキーマを作り切るため、<strong>BASE 着手前に <a href="03_database_design.html">03</a> を確定</strong>しておく(ロジック系の未確定事項はスキーマに影響しないため後続で可)。</p>
 </blockquote>
-<h3 id="p1-アカウント-オンボーディング-api-フロント">P1 — アカウント / オンボーディング(API + フロント)</h3>
+<h3 id="p1-アカウント-目標設定-api-フロント">P1 — アカウント / 目標設定(API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -162,13 +162,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </thead>
 <tbody><tr>
-<td>アカウント API</td>
-<td><code>/me</code>・<code>/onboarding/complete</code>・<code>/me/push-token</code></td>
+<td>アカウント / 目標 API</td>
+<td><code>/account</code>・<code>/account/goal</code>・<code>/account/push-token</code></td>
 <td>BASE-02</td>
 </tr>
 <tr>
-<td>サインイン/オンボーディング画面</td>
-<td>認証フローと初期設定(目的・頻度・既定時間帯・通知許可)</td>
+<td>サインイン/初回設定画面</td>
+<td>認証フローと初回設定(目的・頻度・既定時間帯・通知許可)。オンボーディングは初回UIフロー</td>
 <td>SC-03 / SC-02</td>
 </tr>
 </tbody></table>
@@ -303,7 +303,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <hr>
 <h2 id="3-依存グラフ">3. 依存グラフ</h2>
 <pre><code>BASE 環境構築(全テーブル + 認証 BASE-01)
-   └─ P1 BASE-02 アカウント/オンボーディング(API+フロント)
+   └─ P1 BASE-02 アカウント/目標設定(API+フロント)
          ├─ P2 F03 記録 ──────────────┐
          │        └─ P4 F04 報酬 ── F05 ペナルティ
          ├─ P3 F01 スケジュール ── 06 通知 ── F02 チェックリスト
@@ -358,7 +358,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
         <a href="#1-フェーズ全体像" class="toc-l2">1. フェーズ全体像</a>
 <a href="#2-スプリント計画" class="toc-l2">2. スプリント計画</a>
 <a href="#base-環境構築-土台を完成させる" class="toc-l3">BASE — 環境構築(土台を完成させる)</a>
-<a href="#p1-アカウント-オンボーディング-api-フロント" class="toc-l3">P1 — アカウント / オンボーディング(API + フロント)</a>
+<a href="#p1-アカウント-目標設定-api-フロント" class="toc-l3">P1 — アカウント / 目標設定(API + フロント)</a>
 <a href="#p2-記録の核-最優先の価値-api-フロント" class="toc-l3">P2 — 記録の核(最優先の価値 / API + フロント)</a>
 <a href="#p3-段取り-行かせる仕組み-api-フロント" class="toc-l3">P3 — 段取り(行かせる仕組み / API + フロント)</a>
 <a href="#p4-報酬-続ける動機-api-フロント" class="toc-l3">P4 — 報酬(続ける動機 / API + フロント)</a>

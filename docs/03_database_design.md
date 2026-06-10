@@ -48,7 +48,7 @@ User 1──n NotificationLog
 | goal | text | null可 | 目的(自由記述) |
 | weeklyTarget | int | default 3 | 週あたり目標回数 |
 | defaultTimeOfDay | enum | default `MORNING` | 既定時間帯(MORNING/NOON/NIGHT) |
-| onboardedAt | timestamptz | null可 | オンボーディング完了時刻 |
+| onboardedAt | timestamptz | null可 | 初回設定(目標設定)完了時刻。初回の目標保存時に記録 |
 | createdAt | timestamptz | default now | |
 | updatedAt | timestamptz | | |
 
