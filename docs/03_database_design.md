@@ -45,7 +45,7 @@ User 1──n NotificationLog
 | id | text | PK | ユーザーID |
 | email | text | unique | メール |
 | displayName | text | | 表示名 |
-| goal | text | null可 | 目的(自由記述) |
+| purpose | text | null可 | 目的・動機(自由記述。例「継続したい」) |
 | weeklyTarget | int | default 3 | 週あたり目標回数 |
 | defaultTimeOfDay | enum | default `MORNING` | 既定時間帯(MORNING/NOON/NIGHT) |
 | onboardedAt | timestamptz | null可 | 初回設定(目標設定)完了時刻。初回の目標保存時に記録 |
@@ -215,7 +215,7 @@ model User {
   id               String   @id @default(cuid())
   email            String   @unique
   displayName      String?
-  goal             String?
+  purpose          String?
   weeklyTarget     Int      @default(3)
   defaultTimeOfDay TimeOfDay @default(MORNING)
   onboardedAt      DateTime?

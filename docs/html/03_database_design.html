@@ -156,10 +156,10 @@ User 1──n NotificationLog
 <td>表示名</td>
 </tr>
 <tr>
-<td>goal</td>
+<td>purpose</td>
 <td>text</td>
 <td>null可</td>
-<td>目的(自由記述)</td>
+<td>目的・動機(自由記述。例「継続したい」)</td>
 </tr>
 <tr>
 <td>weeklyTarget</td>
@@ -718,7 +718,7 @@ model User {
   id               String   @id @default(cuid())
   email            String   @unique
   displayName      String?
-  goal             String?
+  purpose          String?
   weeklyTarget     Int      @default(3)
   defaultTimeOfDay TimeOfDay @default(MORNING)
   onboardedAt      DateTime?
