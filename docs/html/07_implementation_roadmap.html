@@ -107,13 +107,23 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </blockquote>
 <hr>
 <h2 id="1-フェーズ全体像">1. フェーズ全体像</h2>
-<pre><code>[P0 基盤] → [P1 記録の核] → [P2 段取り] → [P3 報酬] → [P4 チーム] → [P5 仕上げ]
-                                                                  → [2nd 以降]
+<pre><code>[BASE 環境構築]  ← 環境構築 + 全テーブル作成 + 認証 を“ここで完了させる”
+      │
+      ▼  以降は機能ごとに API + フロントを積む
+[P1 アカウント] → [P2 記録の核] → [P3 段取り] → [P4 報酬] → [P5 チーム] → [P6 仕上げ]
+                                                                        → [2nd 以降]
 </code></pre>
-<p>MVP は P0〜P5。GPS / 全国ランキング / 育成マッチョ / 外部連携は 2nd 以降。</p>
+<ul>
+<li><strong>BASE で土台を作り切る</strong>: 環境構築・<strong>全テーブルの作成</strong>・認証(BASE-01)。以降スキーマ変更は原則発生させない</li>
+<li><strong>P1 以降は機能単位</strong>で、各フェーズが <strong>API + フロントの両方</strong>を完成させる</li>
+<li>GPS / 全国ランキング / 育成マッチョ / 外部連携は 2nd 以降(<a href="01_concept.html">01</a> §7.3)</li>
+</ul>
 <hr>
 <h2 id="2-スプリント計画">2. スプリント計画</h2>
-<h3 id="p0-基盤-土台">P0 — 基盤(土台)</h3>
+<h3 id="base-環境構築-土台を完成させる">BASE — 環境構築(土台を完成させる)</h3>
+<blockquote>
+<p>目的: この段階で <strong>環境構築・全テーブル・認証</strong> を終わらせ、P1 以降は機能の API+フロントに集中できる状態にする。</p>
+</blockquote>
 <table>
 <thead>
 <tr>
@@ -123,27 +133,46 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </thead>
 <tbody><tr>
-<td>リポジトリ/モノレポ</td>
-<td>mobile(Expo)+ api(Hono)+ 共有 zod スキーマ</td>
+<td>環境構築</td>
+<td>モノレポ(mobile=Expo / api=Hono / 共有 zod スキーマ)、lint・format、CI、ローカル起動、EAS ビルド・Expo Push の初期設定</td>
 <td>—</td>
 </tr>
 <tr>
-<td>DB 接続</td>
-<td>Neon + Prisma(driver adapter)初期スキーマ</td>
+<td><strong>全テーブル作成</strong></td>
+<td>Neon + Prisma(driver adapter)で <a href="03_database_design.html">03</a> の<strong>全テーブルを一括マイグレーション</strong>(User / PushToken / Schedule / ChecklistTemplateItem / Checklist / ChecklistItem / Record / UserStats / Trophy / Team / Membership / NotificationLog + Better Auth テーブル)</td>
 <td>03</td>
 </tr>
 <tr>
-<td>認証</td>
-<td>Better Auth(Apple + メール)</td>
+<td>認証(BASE-01)</td>
+<td>Better Auth(Sign in with Apple / メール+パスワード)・セッション・パスワードリセット</td>
 <td>BASE-01</td>
 </tr>
+</tbody></table>
+<blockquote>
+<p><strong>BASE 完了の定義(DoD)</strong>: DB スキーマ全量が適用済み / 認証が一通り動く(Apple・メール+パスワード・リセット)/ mobile・api 双方がローカル起動し疎通する。
+前提: スキーマを作り切るため、<strong>BASE 着手前に <a href="03_database_design.html">03</a> を確定</strong>しておく(ロジック系の未確定事項はスキーマに影響しないため後続で可)。</p>
+</blockquote>
+<h3 id="p1-アカウント-オンボーディング-api-フロント">P1 — アカウント / オンボーディング(API + フロント)</h3>
+<table>
+<thead>
 <tr>
-<td>プロフィール/オンボーディング</td>
-<td><code>/me</code>・初期設定・Push トークン登録</td>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>アカウント API</td>
+<td><code>/me</code>・<code>/onboarding/complete</code>・<code>/me/push-token</code></td>
 <td>BASE-02</td>
 </tr>
+<tr>
+<td>サインイン/オンボーディング画面</td>
+<td>認証フローと初期設定(目的・頻度・既定時間帯・通知許可)</td>
+<td>SC-03 / SC-02</td>
+</tr>
 </tbody></table>
-<h3 id="p1-記録の核-最優先の価値">P1 — 記録の核(最優先の価値)</h3>
+<h3 id="p2-記録の核-最優先の価値-api-フロント">P2 — 記録の核(最優先の価値 / API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -169,9 +198,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </tbody></table>
 <blockquote>
-<p>P1 完了時点で「記録して積み上がる」最小ループが動く。</p>
+<p>P2 完了時点で「記録して積み上がる」最小ループが動く。</p>
 </blockquote>
-<h3 id="p2-段取り-行かせる仕組み">P2 — 段取り(行かせる仕組み)</h3>
+<h3 id="p3-段取り-行かせる仕組み-api-フロント">P3 — 段取り(行かせる仕組み / API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -196,7 +225,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>06</td>
 </tr>
 </tbody></table>
-<h3 id="p3-報酬-続ける動機">P3 — 報酬(続ける動機)</h3>
+<h3 id="p4-報酬-続ける動機-api-フロント">P4 — 報酬(続ける動機 / API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -221,7 +250,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>SC-08</td>
 </tr>
 </tbody></table>
-<h3 id="p4-チーム">P4 — チーム</h3>
+<h3 id="p5-チーム-api-フロント">P5 — チーム(API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -246,7 +275,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>F06 / SC-10</td>
 </tr>
 </tbody></table>
-<h3 id="p5-仕上げ">P5 — 仕上げ</h3>
+<h3 id="p6-仕上げ">P6 — 仕上げ</h3>
 <table>
 <thead>
 <tr>
@@ -273,14 +302,15 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tbody></table>
 <hr>
 <h2 id="3-依存グラフ">3. 依存グラフ</h2>
-<pre><code>BASE-01 認証
-   └─ BASE-02 プロフィール
-         ├─ F03 記録 ──────────────┐
-         │     └─ F04 報酬 ── F05 ペナルティ
-         ├─ F01 スケジュール ── 06 通知 ── F02 チェックリスト
-         └─ F06 チーム(F03 の記録データに依存)
+<pre><code>BASE 環境構築(全テーブル + 認証 BASE-01)
+   └─ P1 BASE-02 アカウント/オンボーディング(API+フロント)
+         ├─ P2 F03 記録 ──────────────┐
+         │        └─ P4 F04 報酬 ── F05 ペナルティ
+         ├─ P3 F01 スケジュール ── 06 通知 ── F02 チェックリスト
+         └─ P5 F06 チーム(F03 の記録データに依存)
 </code></pre>
 <ul>
+<li><strong>テーブルは BASE で全量作成済み</strong>。各機能フェーズは新規マイグレーションを基本伴わず、API+フロントの実装に集中する</li>
 <li><strong>F03(記録)が中心依存</strong>。報酬・チーム・ランキングはすべて記録データに依存する</li>
 <li>通知(06)は F01/F02 の後</li>
 </ul>
@@ -327,12 +357,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
         <div class="toc-title">On this page</div>
         <a href="#1-フェーズ全体像" class="toc-l2">1. フェーズ全体像</a>
 <a href="#2-スプリント計画" class="toc-l2">2. スプリント計画</a>
-<a href="#p0-基盤-土台" class="toc-l3">P0 — 基盤(土台)</a>
-<a href="#p1-記録の核-最優先の価値" class="toc-l3">P1 — 記録の核(最優先の価値)</a>
-<a href="#p2-段取り-行かせる仕組み" class="toc-l3">P2 — 段取り(行かせる仕組み)</a>
-<a href="#p3-報酬-続ける動機" class="toc-l3">P3 — 報酬(続ける動機)</a>
-<a href="#p4-チーム" class="toc-l3">P4 — チーム</a>
-<a href="#p5-仕上げ" class="toc-l3">P5 — 仕上げ</a>
+<a href="#base-環境構築-土台を完成させる" class="toc-l3">BASE — 環境構築(土台を完成させる)</a>
+<a href="#p1-アカウント-オンボーディング-api-フロント" class="toc-l3">P1 — アカウント / オンボーディング(API + フロント)</a>
+<a href="#p2-記録の核-最優先の価値-api-フロント" class="toc-l3">P2 — 記録の核(最優先の価値 / API + フロント)</a>
+<a href="#p3-段取り-行かせる仕組み-api-フロント" class="toc-l3">P3 — 段取り(行かせる仕組み / API + フロント)</a>
+<a href="#p4-報酬-続ける動機-api-フロント" class="toc-l3">P4 — 報酬(続ける動機 / API + フロント)</a>
+<a href="#p5-チーム-api-フロント" class="toc-l3">P5 — チーム(API + フロント)</a>
+<a href="#p6-仕上げ" class="toc-l3">P6 — 仕上げ</a>
 <a href="#3-依存グラフ" class="toc-l2">3. 依存グラフ</a>
 <a href="#4-段階移行-mvp-2nd" class="toc-l2">4. 段階移行(MVP → 2nd)</a>
 <a href="#5-開発規律" class="toc-l2">5. 開発規律</a>
