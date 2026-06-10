@@ -173,14 +173,11 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li><strong>連続カウント</strong>: 「○回連続いけてる!💪」のような連続達成の可視化</li>
 <li><strong>積み重ね</strong>: カウント・トロフィー(ブロンズ / シルバー / ゴールド)</li>
 </ul>
-<blockquote>
-<p>将来的には「日本人の中で 〇〇 位!!」のような全国比較も出したいが、<strong>MVP ではスコープ外</strong>(2nd 以降。母数が必要なため)。</p>
-</blockquote>
 <h3 id="4-3-ペナルティ-サボりに痛みを持たせる">4.3 ペナルティ — サボりに痛みを持たせる</h3>
 <ul>
 <li>サボると<strong>連続カウントが途切れる</strong></li>
 <li><strong>トロフィーのランクが下がる</strong>(降格)</li>
-<li>※ チームメンバーへの「晒し」ペナルティは <strong>MVP では行わない</strong>(個人のトロフィー降格のみ)</li>
+<li>ペナルティは<strong>個人のトロフィー降格に閉じる</strong>(チームへの通知は持たない)</li>
 </ul>
 <h3 id="4-4-チーム-一人にしない">4.4 チーム — 一人にしない</h3>
 <ul>
@@ -202,7 +199,6 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li><strong>記録が完了したら「行った」ことになる</strong></li>
 <li>行っていない日は<strong>ブランク状態</strong>として保持され、後から <strong>「記録する」か「行かなかった」か</strong>を選んで確定できる</li>
-<li>GPS によるチェックイン(位置で自動判定)は <strong>2nd フィーチャー</strong>。MVP では実装しない</li>
 </ul>
 <p>詳細な状態遷移は <a href="02_function_design.html">02 機能設計</a> §F03 を参照。</p>
 <hr>
@@ -293,14 +289,45 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>作成/参加・進捗共有・チーム内ランキング</td>
 </tr>
 </tbody></table>
-<h3 id="7-3-スコープ外-2nd-以降">7.3 スコープ外(2nd 以降)</h3>
-<p>将来章として設計書に明記し、MVP では作らない。</p>
-<ul>
-<li><strong>GPS チェックイン</strong>(位置で行った証明を自動化)</li>
-<li><strong>全国ランキング / 「日本人の中で○位」</strong>(母数が必要)</li>
-<li><strong>育成マッチョ</strong>(筋トレすると育つキャラクター)</li>
-<li><strong>LINE / Google カレンダー連携</strong>(MVP は iOS プッシュのみ)</li>
-</ul>
+<h3 id="7-3-対象外-na-2nd-以降">7.3 対象外(NA / 2nd 以降)</h3>
+<p>以下は <strong>MVP では実装しない</strong>。本節を対象外の<strong>唯一の根拠</strong>とし、他文書・他節では個別に「スコープ外」を散発的に書かない(必要なときは本節を参照する)。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>見送り理由 / 移行時の論点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPS チェックイン</td>
+<td>位置で「行った」を自動判定</td>
+<td>MVP は自己申告(§5)。位置許可・判定精度の検証が必要</td>
+</tr>
+<tr>
+<td>全国ランキング / 「日本人の中で○位」</td>
+<td>全ユーザー横断の順位</td>
+<td>一定のユーザー母数が前提。MVP はチーム内ランキングのみ</td>
+</tr>
+<tr>
+<td>育成マッチョ</td>
+<td>筋トレで育つキャラクター</td>
+<td>記録データに連動。まず習慣化ループの確立を優先</td>
+</tr>
+<tr>
+<td>LINE / Google カレンダー連携</td>
+<td>外部経路のリマインド</td>
+<td>MVP は iOS プッシュのみ。OAuth / 各 API 連携が必要</td>
+</tr>
+<tr>
+<td>チームへの「晒し」ペナルティ</td>
+<td>未達をチームに通知</td>
+<td>MVP は個人のトロフィー降格のみ。関係性リスクを避ける</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>2nd の各項目は、それぞれ独立した spec → plan → 実装サイクルで進める(→ <a href="07_implementation_roadmap.html">07 ロードマップ</a> §4)。</p>
+</blockquote>
 <hr>
 <h2 id="8-成功の判断材料-mvp">8. 成功の判断材料(MVP)</h2>
 <table>
@@ -346,7 +373,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#7-機能スコープ" class="toc-l2">7. 機能スコープ</a>
 <a href="#7-1-ベース機能" class="toc-l3">7.1 ベース機能</a>
 <a href="#7-2-mvp-機能" class="toc-l3">7.2 MVP 機能</a>
-<a href="#7-3-スコープ外-2nd-以降" class="toc-l3">7.3 スコープ外(2nd 以降)</a>
+<a href="#7-3-対象外-na-2nd-以降" class="toc-l3">7.3 対象外(NA / 2nd 以降)</a>
 <a href="#8-成功の判断材料-mvp" class="toc-l2">8. 成功の判断材料(MVP)</a>
       </aside>
     </div>
