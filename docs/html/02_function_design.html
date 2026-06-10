@@ -181,8 +181,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="2-base-01-認証・アカウント">2. BASE-01 認証・アカウント</h2>
 <h3 id="2-1-要件">2.1 要件</h3>
 <ul>
-<li><strong>Sign in with Apple</strong> と <strong>メール(マジックリンク or パスワード)</strong> の 2 方式</li>
-<li>認証基盤は <strong>Better Auth</strong>(Hono + Prisma 統合)</li>
+<li>ログインは次の <strong>2 方式のいずれか</strong>(どちらで入っても同一アカウントに紐づく)<ul>
+<li><strong>Sign in with Apple</strong></li>
+<li><strong>メール + パスワード</strong></li>
+</ul>
+</li>
+<li>メール+パスワードは、<strong>パスワードリセット(メールによる再設定フロー)</strong> とメール確認を含む</li>
+<li>認証基盤は <strong>Better Auth</strong>(Hono + Prisma 統合)。<strong>パスワードはハッシュ化して保存</strong>(平文保持しない)</li>
 <li>初回サインイン時に User レコードを作成し、オンボーディングへ誘導</li>
 </ul>
 <h3 id="2-2-エンドポイント">2.2 エンドポイント</h3>
@@ -197,7 +202,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td><code>*</code></td>
 <td><code>/auth/*</code></td>
-<td>Better Auth が提供(サインイン・コールバック・セッション)</td>
+<td>Better Auth が提供(Apple サインイン・メール+パスワードのサインアップ/サインイン・パスワードリセット・セッション)</td>
 </tr>
 <tr>
 <td>GET</td>

@@ -18,7 +18,7 @@
 | バックエンド | **Hono(TypeScript)** | 既存資産(TS/Hono)が活きる |
 | ORM | **Prisma** | Neon serverless driver adapter 利用 |
 | DB | **Neon(PostgreSQL)** | サーバーレス。チーム集計を SQL で |
-| 認証 | **Better Auth** | Sign in with Apple + メール、Hono/Prisma 統合 |
+| 認証 | **Better Auth** | Sign in with Apple / メール+パスワード、Hono/Prisma 統合 |
 | スケジューラ | **cron** | リマインド/アラート配信(§06) |
 | バリデーション | **zod** | API スキーマをフロント/バックで共有 |
 
@@ -47,7 +47,7 @@
 
 ### 2.4 Better Auth
 
-- Sign in with Apple とメールの両対応
+- Sign in with Apple とメール+パスワードの両対応(パスワードリセット含む)
 - Hono / Prisma と統合でき、認証テーブルを Prisma 管理下に置ける
 
 ---
