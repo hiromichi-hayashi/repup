@@ -194,8 +194,8 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="4-対象抽出ロジック">4. 対象抽出ロジック</h2>
 <p>cron 実行ごとに、現在時刻(UTC)を基準に以下を抽出する。</p>
 <ol>
-<li><strong>当日リマインド(N-01)</strong>: 今日が <code>Schedule.date</code>、または繰り返しルールに今日の曜日が含まれ <code>active=true</code> の予定。配信予定時刻に達したもの</li>
-<li><strong>前日リマインド(N-02)</strong>: 明日が対象日の予定。前日配信時刻に達したもの</li>
+<li><strong>当日リマインド(N-01)</strong>: 今日が**予定日(オカレンス)**である <code>active=true</code> の予定(<code>recurrenceRule</code> を展開して判定: single / weekly+interval / monthly。展開仕様は <a href="02_function_design.html">02</a> §4.2)。配信予定時刻に達したもの</li>
+<li><strong>前日リマインド(N-02)</strong>: 明日が予定日の予定。前日配信時刻に達したもの</li>
 <li><strong>チェックリスト未達(N-03)</strong>: N-02 対象のうち、紐づく <code>Checklist</code> に <code>checked=false</code> の項目が残るもの</li>
 <li>各対象ユーザーの有効な <code>PushToken</code> を解決</li>
 </ol>

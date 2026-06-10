@@ -46,8 +46,7 @@ User 1──n NotificationLog
 | email | text | unique | メール |
 | displayName | text | | 表示名 |
 | purpose | text | null可 | 目的・動機(自由記述。例「継続したい」) |
-| weeklyTarget | int | default 3 | 週あたり目標回数 |
-| defaultTimeOfDay | enum | default `MORNING` | 既定時間帯(MORNING/NOON/NIGHT) |
+| defaultTimeOfDay | enum | default `MORNING` | 既定時間帯(MORNING/NOON/NIGHT)。新規スケジュールの初期値 |
 | onboardedAt | timestamptz | null可 | 初回設定(目標設定)完了時刻。初回の目標保存時に記録 |
 | createdAt | timestamptz | default now | |
 | updatedAt | timestamptz | | |
@@ -66,20 +65,30 @@ Expo Push トークン(端末ごと)。
 
 ### 3.3 Schedule(F01)
 
-行く予定。単発・繰り返しを表現。
+通う日(= 行く予定)。単発・繰り返しを表現し、**予定日(オカレンス)を生成する基準**。リマインドと連続カウント(F04 §7.1)の両方がこの予定日に依存する。
 
 | カラム | 型 | 制約 | 説明 |
 |---|---|---|---|
 | id | text | PK | |
 | userId | text | FK→User | |
 | date | date | null可 | 単発予定の日付(繰り返し時は null) |
-| recurrenceRule | jsonb | null可 | 繰り返し定義(例 `{ "weekdays": [1,3,5] }`) |
+| recurrenceRule | jsonb | null可 | 繰り返し定義([02](02_function_design.html) §4.2)。weekly(interval+weekdays)/ monthly(days)/ single |
+| startDate | date | null可 | N週ごと(interval≥2)の基準週。週次の起点 |
 | timeOfDay | enum | | MORNING/NOON/NIGHT |
 | startTime | time | null可 | 開始予定時刻(任意) |
 | active | boolean | default true | 繰り返しの有効/無効 |
 | createdAt | timestamptz | default now | |
 
-> 単発は `date` を持つ。繰り返しは `recurrenceRule` を持ち、cron が当日該当分を `Record` の評価対象として展開する。
+`recurrenceRule` の例:
+
+```
+単発:     { "type": "single",  "date": "2026-06-15" }
+毎週:     { "type": "weekly",  "interval": 1, "weekdays": [1,3,5] }
+2週に1回: { "type": "weekly",  "interval": 2, "weekdays": [1] }
+毎月:     { "type": "monthly", "days": [1,15] }
+```
+
+> 単発は `date`、繰り返しは `recurrenceRule`(+ interval≥2 は `startDate`)を持つ。アプリ/cron は指定期間に対して**予定日の集合**を生成し、`Record`(達成判定)・リマインド・連続カウントの基準にする。
 
 ### 3.4 ChecklistTemplateItem(F02)
 
@@ -216,7 +225,6 @@ model User {
   email            String   @unique
   displayName      String?
   purpose          String?
-  weeklyTarget     Int      @default(3)
   defaultTimeOfDay TimeOfDay @default(MORNING)
   onboardedAt      DateTime?
   createdAt        DateTime @default(now())

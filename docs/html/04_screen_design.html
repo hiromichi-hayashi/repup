@@ -126,7 +126,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>SC-02</td>
 <td>オンボーディング</td>
 <td>BASE-02</td>
-<td>目的・頻度・時間帯・通知許可</td>
+<td>目的・通う日(繰り返し)・時間帯・通知許可</td>
 </tr>
 <tr>
 <td>SC-03</td>
@@ -208,8 +208,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h3 id="sc-02-オンボーディング-初回設定の-ui-フロー">SC-02 オンボーディング(初回設定の UI フロー)</h3>
 <p><strong>目的</strong>: 動機づけの初期設定。初回に目標設定を一度通すだけの画面で、独立した API は持たない(<a href="02_function_design.html">02</a> §3.3)。</p>
 <ul>
-<li>目的の入力/選択 → 週の目標回数 → 既定時間帯(<strong>朝を推奨表示</strong>)→ 通知許可</li>
-<li>完了で設定を保存(<code>PATCH /account</code>、サーバーが <code>onboardedAt</code> を記録)し、ホームへ</li>
+<li>目的の入力/選択 → <strong>通う日(繰り返しスケジュール)の設定</strong>(毎週の曜日 / N週ごと / 毎月の日) → 既定時間帯(<strong>朝を推奨表示</strong>)→ 通知許可</li>
+<li>完了でアカウント設定を保存(<code>PATCH /account</code>、<code>onboardedAt</code> 記録)、通う日を作成(<code>POST /schedules</code>)し、ホームへ</li>
+<li>通う日は連続カウント(F04)の基準になる(SC-04 で後から編集可)</li>
 </ul>
 <h3 id="sc-03-サインイン">SC-03 サインイン</h3>
 <ul>
@@ -218,10 +219,16 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>初回は User 作成 → SC-02 へ</li>
 </ul>
 <h3 id="sc-04-スケジュール一覧-編集">SC-04 スケジュール一覧 / 編集</h3>
-<p><strong>目的</strong>: 行く日を決める(F01)。</p>
+<p><strong>目的</strong>: 通う日を決める(F01)。連続カウント(F04)の基準にもなる。</p>
 <ul>
-<li>カレンダー or リスト表示。単発追加 / 繰り返し(曜日選択)</li>
-<li>各予定に時間帯。<strong>朝をデフォルト</strong>に寄せる UI</li>
+<li>カレンダー or リスト表示。繰り返しパターンを選んで設定:<ul>
+<li><strong>毎週</strong>: 曜日選択(月・水・金 など)</li>
+<li><strong>N週ごと</strong>: 曜日 + 間隔(2週に1回 など)</li>
+<li><strong>毎月</strong>: 日付選択(毎月1日・15日 など)</li>
+<li><strong>単発</strong>: 特定日</li>
+</ul>
+</li>
+<li>各予定に時間帯。<strong>朝を既定</strong>に寄せる UI</li>
 <li>予定からチェックリスト(SC-05)へ</li>
 </ul>
 <h3 id="sc-05-準備チェックリスト">SC-05 準備チェックリスト</h3>

@@ -152,7 +152,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p><strong>BASE 完了の定義(DoD)</strong>: DB スキーマ全量が適用済み / 認証が一通り動く(Apple・メール+パスワード・リセット)/ mobile・api 双方がローカル起動し疎通する。
 前提: スキーマを作り切るため、<strong>BASE 着手前に <a href="03_database_design.html">03</a> を確定</strong>しておく(ロジック系の未確定事項はスキーマに影響しないため後続で可)。</p>
 </blockquote>
-<h3 id="p1-アカウント-目標設定-api-フロント">P1 — アカウント / 目標設定(API + フロント)</h3>
+<h3 id="p1-アカウント-目標設定-通う日-api-フロント">P1 — アカウント / 目標設定 / 通う日(API + フロント)</h3>
 <table>
 <thead>
 <tr>
@@ -167,11 +167,19 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>BASE-02</td>
 </tr>
 <tr>
+<td>通う日(繰り返しスケジュール)</td>
+<td><code>/schedules</code>、<code>recurrenceRule</code>(weekly+interval / monthly / single)、<strong>予定日(オカレンス)生成</strong></td>
+<td>F01 / SC-04</td>
+</tr>
+<tr>
 <td>サインイン/初回設定画面</td>
-<td>認証フローと初回設定(目的・頻度・既定時間帯・通知許可)。オンボーディングは初回UIフロー</td>
+<td>認証フローと初回設定(目的・<strong>通う日</strong>・既定時間帯・通知許可)。オンボーディングは初回UIフロー</td>
 <td>SC-03 / SC-02</td>
 </tr>
 </tbody></table>
+<blockquote>
+<p>連続カウント(F04)が予定日に依存するため、通う日(繰り返しスケジュール)の作成・予定日生成は P1 で用意する。リマインド配信は P3。</p>
+</blockquote>
 <h3 id="p2-記録の核-最優先の価値-api-フロント">P2 — 記録の核(最優先の価値 / API + フロント)</h3>
 <table>
 <thead>
@@ -210,21 +218,19 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </thead>
 <tbody><tr>
-<td>スケジュール</td>
-<td>単発/繰り返し予定</td>
-<td>F01 / SC-04</td>
-</tr>
-<tr>
 <td>チェックリスト</td>
 <td>テンプレート + 予定実体</td>
 <td>F02 / SC-05,06</td>
 </tr>
 <tr>
 <td>通知基盤</td>
-<td>cron + Expo Push、N-01〜N-03、冪等性</td>
+<td>cron + Expo Push、N-01〜N-03、冪等性。<strong>P1 の予定日(オカレンス)を基準に配信</strong></td>
 <td>06</td>
 </tr>
 </tbody></table>
+<blockquote>
+<p>通う日(スケジュール)自体は P1 で構築済み。P3 はその予定日に対するリマインド配信とチェックリストを載せる。</p>
+</blockquote>
 <h3 id="p4-報酬・ペナルティ-続ける動機-api-フロント">P4 — 報酬・ペナルティ(続ける動機 / API + フロント)</h3>
 <table>
 <thead>
@@ -303,16 +309,17 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <hr>
 <h2 id="3-依存グラフ">3. 依存グラフ</h2>
 <pre><code>BASE 環境構築(全テーブル + 認証 BASE-01)
-   └─ P1 BASE-02 アカウント/目標設定(API+フロント)
-         ├─ P2 F03 記録 ──────────────┐
-         │        └─ P4 F04 報酬・ペナルティ(積み重ねの増減)
-         ├─ P3 F01 スケジュール ── 06 通知 ── F02 チェックリスト
-         └─ P5 F06 チーム(F03 の記録データに依存)
+   └─ P1 アカウント/目標設定 + 通う日(F01 繰り返しスケジュール → 予定日生成)
+         ├─ P2 F03 記録 ─────────┐
+         │                       └─ P4 F04 報酬・ペナルティ(予定日 × 記録で連続判定)
+         ├─ P3 06 通知 ── F02 チェックリスト   ※リマインドは P1 の予定日が基準
+         └─ P5 F06 チーム(F03 の記録に依存)
 </code></pre>
 <ul>
 <li><strong>テーブルは BASE で全量作成済み</strong>。各機能フェーズは新規マイグレーションを基本伴わず、API+フロントの実装に集中する</li>
-<li><strong>F03(記録)が中心依存</strong>。報酬・チーム・ランキングはすべて記録データに依存する</li>
-<li>通知(06)は F01/F02 の後</li>
+<li><strong>連続カウント(F04)は「予定日(P1 スケジュール)× 記録(P2)」に依存</strong>。通う日は P1 で先に用意する</li>
+<li><strong>F03(記録)が中心依存</strong>。報酬・チーム・ランキングは記録データに依存する</li>
+<li>通知(06)は P1 の予定日 + F02 の後</li>
 </ul>
 <hr>
 <h2 id="4-段階移行-mvp-2nd">4. 段階移行(MVP → 2nd)</h2>
@@ -358,7 +365,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
         <a href="#1-フェーズ全体像" class="toc-l2">1. フェーズ全体像</a>
 <a href="#2-スプリント計画" class="toc-l2">2. スプリント計画</a>
 <a href="#base-環境構築-土台を完成させる" class="toc-l3">BASE — 環境構築(土台を完成させる)</a>
-<a href="#p1-アカウント-目標設定-api-フロント" class="toc-l3">P1 — アカウント / 目標設定(API + フロント)</a>
+<a href="#p1-アカウント-目標設定-通う日-api-フロント" class="toc-l3">P1 — アカウント / 目標設定 / 通う日(API + フロント)</a>
 <a href="#p2-記録の核-最優先の価値-api-フロント" class="toc-l3">P2 — 記録の核(最優先の価値 / API + フロント)</a>
 <a href="#p3-段取り-行かせる仕組み-api-フロント" class="toc-l3">P3 — 段取り(行かせる仕組み / API + フロント)</a>
 <a href="#p4-報酬・ペナルティ-続ける動機-api-フロント" class="toc-l3">P4 — 報酬・ペナルティ(続ける動機 / API + フロント)</a>
