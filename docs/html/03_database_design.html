@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>03 データベース設計書 | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html" class="active"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 03</div>
+          <h1>データベース設計書</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: MVP の Prisma スキーマ / テーブル定義</p>
+<blockquote>
+<p>DB は <strong>Neon(PostgreSQL)</strong>、ORM は <strong>Prisma</strong>(Neon serverless driver adapter)。機能との対応は <a href="02_function_design.html">02 機能設計</a> を参照。</p>
+</blockquote>
+<hr>
+<h2 id="1-方針">1. 方針</h2>
+<ul>
+<li><strong>オンラインファースト</strong>。サーバーが SSoT。端末はキャッシュのみ</li>
+<li>内部時刻は <strong>UTC</strong>(<code>timestamptz</code>)。表示時に JST へ変換</li>
+<li>ID は <code>cuid</code>/<code>uuid</code>。論理削除はせず、必要箇所のみ <code>deletedAt</code> を検討</li>
+<li>認証関連テーブル(User / Session / Account 等)は <strong>Better Auth</strong> が管理。本書はアプリ固有テーブルを定義し、認証テーブルは概略のみ記す</li>
+</ul>
+<hr>
+<h2 id="2-er-概要">2. ER 概要</h2>
+<pre><code>User 1──n Schedule 1──1 Checklist 1──n ChecklistItem
+User 1──n ChecklistTemplateItem
+User 1──n Record
+User 1──1 UserStats
+User 1──n Trophy
+User n──n Team  (via Membership)
+Team 1──n Membership
+User 1──n NotificationLog
+</code></pre>
+<hr>
+<h2 id="3-テーブル定義">3. テーブル定義</h2>
+<h3 id="3-1-user">3.1 User</h3>
+<p>アプリ利用者。認証情報は Better Auth が別途保持し、本テーブルはアプリ属性を持つ。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td>ユーザーID</td>
+</tr>
+<tr>
+<td>email</td>
+<td>text</td>
+<td>unique</td>
+<td>メール</td>
+</tr>
+<tr>
+<td>displayName</td>
+<td>text</td>
+<td></td>
+<td>表示名</td>
+</tr>
+<tr>
+<td>goal</td>
+<td>text</td>
+<td>null可</td>
+<td>目的(自由記述)</td>
+</tr>
+<tr>
+<td>weeklyTarget</td>
+<td>int</td>
+<td>default 3</td>
+<td>週あたり目標回数</td>
+</tr>
+<tr>
+<td>defaultTimeOfDay</td>
+<td>enum</td>
+<td>default <code>MORNING</code></td>
+<td>既定時間帯(MORNING/NOON/NIGHT)</td>
+</tr>
+<tr>
+<td>onboardedAt</td>
+<td>timestamptz</td>
+<td>null可</td>
+<td>オンボーディング完了時刻</td>
+</tr>
+<tr>
+<td>createdAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+<tr>
+<td>updatedAt</td>
+<td>timestamptz</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-2-pushtoken">3.2 PushToken</h3>
+<p>Expo Push トークン(端末ごと)。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>token</td>
+<td>text</td>
+<td>unique</td>
+<td>Expo Push Token</td>
+</tr>
+<tr>
+<td>platform</td>
+<td>enum</td>
+<td></td>
+<td>iOS/Android</td>
+</tr>
+<tr>
+<td>updatedAt</td>
+<td>timestamptz</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-3-schedule-f01">3.3 Schedule(F01)</h3>
+<p>行く予定。単発・繰り返しを表現。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>date</td>
+<td>date</td>
+<td>null可</td>
+<td>単発予定の日付(繰り返し時は null)</td>
+</tr>
+<tr>
+<td>recurrenceRule</td>
+<td>jsonb</td>
+<td>null可</td>
+<td>繰り返し定義(例 <code>{ &quot;weekdays&quot;: [1,3,5] }</code>)</td>
+</tr>
+<tr>
+<td>timeOfDay</td>
+<td>enum</td>
+<td></td>
+<td>MORNING/NOON/NIGHT</td>
+</tr>
+<tr>
+<td>startTime</td>
+<td>time</td>
+<td>null可</td>
+<td>開始予定時刻(任意)</td>
+</tr>
+<tr>
+<td>active</td>
+<td>boolean</td>
+<td>default true</td>
+<td>繰り返しの有効/無効</td>
+</tr>
+<tr>
+<td>createdAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>単発は <code>date</code> を持つ。繰り返しは <code>recurrenceRule</code> を持ち、cron が当日該当分を <code>Record</code> の評価対象として展開する。</p>
+</blockquote>
+<h3 id="3-4-checklisttemplateitem-f02">3.4 ChecklistTemplateItem(F02)</h3>
+<p>ユーザーごとの準備項目テンプレート(再利用される定義)。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>label</td>
+<td>text</td>
+<td></td>
+<td>例: タオル / コワーキング予約済み?</td>
+</tr>
+<tr>
+<td>sortOrder</td>
+<td>int</td>
+<td></td>
+<td>表示順</td>
+</tr>
+<tr>
+<td>active</td>
+<td>boolean</td>
+<td>default true</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-5-checklist-f02">3.5 Checklist(F02)</h3>
+<p>特定の予定に対するチェックリスト実体。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>scheduleId</td>
+<td>text</td>
+<td>FK→Schedule, unique</td>
+<td>1 予定 1 チェックリスト</td>
+</tr>
+<tr>
+<td>createdAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-6-checklistitem-f02">3.6 ChecklistItem(F02)</h3>
+<p>チェックリストの各項目(テンプレートから複製、状態を持つ)。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>checklistId</td>
+<td>text</td>
+<td>FK→Checklist</td>
+<td></td>
+</tr>
+<tr>
+<td>label</td>
+<td>text</td>
+<td></td>
+<td>複製時点のラベル</td>
+</tr>
+<tr>
+<td>checked</td>
+<td>boolean</td>
+<td>default false</td>
+<td></td>
+</tr>
+<tr>
+<td>checkedAt</td>
+<td>timestamptz</td>
+<td>null可</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-7-record-f03">3.7 Record(F03)</h3>
+<p>その日の確定状態。RECORDED / SKIPPED を保持(BLANK はレコード不在で表す)。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>date</td>
+<td>date</td>
+<td></td>
+<td>実施(対象)日</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td></td>
+<td>RECORDED / SKIPPED</td>
+</tr>
+<tr>
+<td>scheduleId</td>
+<td>text</td>
+<td>FK→Schedule, null可</td>
+<td>紐づく予定(任意日記録は null)</td>
+</tr>
+<tr>
+<td>memo</td>
+<td>text</td>
+<td>null可</td>
+<td>メモ(MVP 任意)</td>
+</tr>
+<tr>
+<td>tags</td>
+<td>text[]</td>
+<td>null可</td>
+<td>部位/種目タグ(任意)</td>
+</tr>
+<tr>
+<td>durationMin</td>
+<td>int</td>
+<td>null可</td>
+<td>所要時間(任意)</td>
+</tr>
+<tr>
+<td>createdAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>制約: <code>(userId, date)</code> で一意(1 日 1 確定)。BLANK はレコードを作らないことで表現する。</p>
+<blockquote>
+<p>状態遷移の定義は <a href="02_function_design.html">02 機能設計</a> §F03 を参照。</p>
+</blockquote>
+<h3 id="3-8-userstats-f04">3.8 UserStats(F04)</h3>
+<p>集計のキャッシュ(導出値)。リアルタイム算出が重い場合の高速化用。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>userId</td>
+<td>text</td>
+<td>PK, FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>currentStreak</td>
+<td>int</td>
+<td>default 0</td>
+<td>現在の連続カウント</td>
+</tr>
+<tr>
+<td>longestStreak</td>
+<td>int</td>
+<td>default 0</td>
+<td>最長連続</td>
+</tr>
+<tr>
+<td>totalRecords</td>
+<td>int</td>
+<td>default 0</td>
+<td>累積記録数</td>
+</tr>
+<tr>
+<td>currentRank</td>
+<td>enum</td>
+<td>default <code>NONE</code></td>
+<td>NONE/BRONZE/SILVER/GOLD</td>
+</tr>
+<tr>
+<td>updatedAt</td>
+<td>timestamptz</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群。</p>
+</blockquote>
+<h3 id="3-9-trophy-f04">3.9 Trophy(F04)</h3>
+<p>獲得トロフィーの履歴。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>rank</td>
+<td>enum</td>
+<td></td>
+<td>BRONZE/SILVER/GOLD</td>
+</tr>
+<tr>
+<td>awardedAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td>獲得日時</td>
+</tr>
+<tr>
+<td>revokedAt</td>
+<td>timestamptz</td>
+<td>null可</td>
+<td>降格で失効した日時</td>
+</tr>
+</tbody></table>
+<h3 id="3-10-team-f06">3.10 Team(F06)</h3>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>text</td>
+<td></td>
+<td>チーム名</td>
+</tr>
+<tr>
+<td>ownerId</td>
+<td>text</td>
+<td>FK→User</td>
+<td>オーナー</td>
+</tr>
+<tr>
+<td>inviteCode</td>
+<td>text</td>
+<td>unique</td>
+<td>招待コード</td>
+</tr>
+<tr>
+<td>createdAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-11-membership-f06">3.11 Membership(F06)</h3>
+<p>User と Team の中間。進捗共有の単位。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>teamId</td>
+<td>text</td>
+<td>FK→Team</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>role</td>
+<td>enum</td>
+<td>default <code>MEMBER</code></td>
+<td>OWNER/MEMBER</td>
+</tr>
+<tr>
+<td>joinedAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>制約: <code>(teamId, userId)</code> で一意。</p>
+<h3 id="3-12-notificationlog-通知の冪等性">3.12 NotificationLog(通知の冪等性)</h3>
+<p>プッシュ通知の二重送信を防ぐ送信記録。定義・用途は <a href="06_notification_design.html">06 通知設計</a> §5 に対応。</p>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>scheduleId</td>
+<td>text</td>
+<td>FK→Schedule, null可</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>enum</td>
+<td></td>
+<td>N01/N02/N03/N04</td>
+</tr>
+<tr>
+<td>targetDate</td>
+<td>date</td>
+<td></td>
+<td>対象日</td>
+</tr>
+<tr>
+<td>sentAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td>送信日時</td>
+</tr>
+</tbody></table>
+<p>制約: <code>(userId, scheduleId, type, targetDate)</code> で一意。cron は送信前にこのキーで存在チェックする。</p>
+<hr>
+<h2 id="4-prisma-スキーマ-抜粋">4. Prisma スキーマ(抜粋)</h2>
+<pre><code class="language-prisma">enum TimeOfDay { MORNING NOON NIGHT }
+enum RecordStatus { RECORDED SKIPPED }
+enum Rank { NONE BRONZE SILVER GOLD }
+enum Role { OWNER MEMBER }
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  displayName      String?
+  goal             String?
+  weeklyTarget     Int      @default(3)
+  defaultTimeOfDay TimeOfDay @default(MORNING)
+  onboardedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  schedules        Schedule[]
+  records          Record[]
+  templateItems    ChecklistTemplateItem[]
+  memberships      Membership[]
+  trophies         Trophy[]
+  stats            UserStats?
+  pushTokens       PushToken[]
+}
+
+model Record {
+  id         String       @id @default(cuid())
+  userId     String
+  date       DateTime     @db.Date
+  status     RecordStatus
+  scheduleId String?
+  memo       String?
+  tags       String[]
+  durationMin Int?
+  createdAt  DateTime     @default(now())
+  user       User         @relation(fields: [userId], references: [id])
+  schedule   Schedule?    @relation(fields: [scheduleId], references: [id])
+  @@unique([userId, date])
+}
+</code></pre>
+<blockquote>
+<p>全 model の完全版は実装時に <code>schema.prisma</code> として確定する。本書は MVP に必要なテーブルと主要カラム・制約を定義する。</p>
+</blockquote>
+<hr>
+<h2 id="5-インデックス方針">5. インデックス方針</h2>
+<table>
+<thead>
+<tr>
+<th>テーブル</th>
+<th>インデックス</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Record</td>
+<td><code>(userId, date)</code> unique</td>
+<td>1日1確定・期間取得</td>
+</tr>
+<tr>
+<td>Schedule</td>
+<td><code>(userId, date)</code>, <code>(userId, active)</code></td>
+<td>当日対象抽出</td>
+</tr>
+<tr>
+<td>Membership</td>
+<td><code>(teamId)</code>, <code>(userId)</code></td>
+<td>チーム集計・所属取得</td>
+</tr>
+<tr>
+<td>Trophy</td>
+<td><code>(userId, awardedAt)</code></td>
+<td>履歴取得</td>
+</tr>
+</tbody></table>
+
+        <nav class="pager"><a href="02_function_design.html"><div class="dir">← PREV</div><div class="t">02 機能設計</div></a><a href="04_screen_design.html" class="next"><div class="dir">NEXT →</div><div class="t">04 画面設計</div></a></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-方針" class="toc-l2">1. 方針</a>
+<a href="#2-er-概要" class="toc-l2">2. ER 概要</a>
+<a href="#3-テーブル定義" class="toc-l2">3. テーブル定義</a>
+<a href="#3-1-user" class="toc-l3">3.1 User</a>
+<a href="#3-2-pushtoken" class="toc-l3">3.2 PushToken</a>
+<a href="#3-3-schedule-f01" class="toc-l3">3.3 Schedule(F01)</a>
+<a href="#3-4-checklisttemplateitem-f02" class="toc-l3">3.4 ChecklistTemplateItem(F02)</a>
+<a href="#3-5-checklist-f02" class="toc-l3">3.5 Checklist(F02)</a>
+<a href="#3-6-checklistitem-f02" class="toc-l3">3.6 ChecklistItem(F02)</a>
+<a href="#3-7-record-f03" class="toc-l3">3.7 Record(F03)</a>
+<a href="#3-8-userstats-f04" class="toc-l3">3.8 UserStats(F04)</a>
+<a href="#3-9-trophy-f04" class="toc-l3">3.9 Trophy(F04)</a>
+<a href="#3-10-team-f06" class="toc-l3">3.10 Team(F06)</a>
+<a href="#3-11-membership-f06" class="toc-l3">3.11 Membership(F06)</a>
+<a href="#3-12-notificationlog-通知の冪等性" class="toc-l3">3.12 NotificationLog(通知の冪等性)</a>
+<a href="#4-prisma-スキーマ-抜粋" class="toc-l2">4. Prisma スキーマ(抜粋)</a>
+<a href="#5-インデックス方針" class="toc-l2">5. インデックス方針</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>04 画面設計書 | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html" class="active"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 04</div>
+          <h1>画面設計書</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: MVP の画面一覧(SC-01〜SC-11)と遷移</p>
+<blockquote>
+<p>機能との対応は <a href="02_function_design.html">02 機能設計</a>。React Native + Expo / iOS 優先。</p>
+</blockquote>
+<hr>
+<h2 id="1-画面一覧">1. 画面一覧</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>画面</th>
+<th>対応機能</th>
+<th>概要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SC-01</td>
+<td>ホーム</td>
+<td>F01/F03/F04</td>
+<td>今日の予定・連続カウント・記録ボタン</td>
+</tr>
+<tr>
+<td>SC-02</td>
+<td>オンボーディング</td>
+<td>BASE-02</td>
+<td>目的・頻度・時間帯・通知許可</td>
+</tr>
+<tr>
+<td>SC-03</td>
+<td>サインイン</td>
+<td>BASE-01</td>
+<td>Apple / メール</td>
+</tr>
+<tr>
+<td>SC-04</td>
+<td>スケジュール一覧/編集</td>
+<td>F01</td>
+<td>行く日の設定・繰り返し</td>
+</tr>
+<tr>
+<td>SC-05</td>
+<td>準備チェックリスト</td>
+<td>F02</td>
+<td>予定ごとの項目チェック</td>
+</tr>
+<tr>
+<td>SC-06</td>
+<td>チェックリストテンプレート編集</td>
+<td>F02</td>
+<td>項目のカスタム</td>
+</tr>
+<tr>
+<td>SC-07</td>
+<td>記録入力</td>
+<td>F03</td>
+<td>記録する/行かなかった の確定</td>
+</tr>
+<tr>
+<td>SC-08</td>
+<td>成長・トロフィー</td>
+<td>F04</td>
+<td>連続・累積・ランク・グラフ</td>
+</tr>
+<tr>
+<td>SC-09</td>
+<td>チーム</td>
+<td>F06</td>
+<td>メンバー進捗・参加/作成</td>
+</tr>
+<tr>
+<td>SC-10</td>
+<td>チーム内ランキング</td>
+<td>F06</td>
+<td>順位表示</td>
+</tr>
+<tr>
+<td>SC-11</td>
+<td>設定</td>
+<td>BASE-02</td>
+<td>プロフィール・通知設定</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-ナビゲーション構造">2. ナビゲーション構造</h2>
+<p>下タブ(Bottom Tab)4 つを基本に、モーダルで詳細を出す。</p>
+<pre><code>[Tab] ホーム(SC-01) ─ 記録入力(SC-07, モーダル)
+[Tab] スケジュール(SC-04) ─ チェックリスト(SC-05) / テンプレ編集(SC-06)
+[Tab] チーム(SC-09) ─ ランキング(SC-10)
+[Tab] 成長(SC-08)
+        設定(SC-11) は各所からアクセス
+
+初回のみ: サインイン(SC-03) → オンボーディング(SC-02) → ホーム
+</code></pre>
+<hr>
+<h2 id="3-画面詳細">3. 画面詳細</h2>
+<h3 id="sc-01-ホーム">SC-01 ホーム</h3>
+<p><strong>目的</strong>: 「いかなきゃ」と「続いている実感」を一目で。アプリの主役画面。</p>
+<ul>
+<li>今日の予定(あれば時間帯)。なければ「予定を追加」導線</li>
+<li><strong>連続カウント</strong>を大きく表示(「12回連続いけてる!💪」)</li>
+<li>現在のトロフィーランク(ブロンズ/シルバー/ゴールド)</li>
+<li>主要 CTA: <strong>記録する</strong>(→ SC-07)</li>
+<li>過去のブランク日があれば「確定する」導線(→ SC-07)</li>
+</ul>
+<h3 id="sc-02-オンボーディング">SC-02 オンボーディング</h3>
+<p><strong>目的</strong>: 動機づけの初期設定。</p>
+<ul>
+<li>目的の入力/選択 → 週の目標回数 → 既定時間帯(<strong>朝を推奨表示</strong>)→ 通知許可</li>
+<li>完了で <code>POST /onboarding/complete</code>、ホームへ</li>
+</ul>
+<h3 id="sc-03-サインイン">SC-03 サインイン</h3>
+<ul>
+<li>Sign in with Apple ボタン / メールでサインイン</li>
+<li>初回は User 作成 → SC-02 へ</li>
+</ul>
+<h3 id="sc-04-スケジュール一覧-編集">SC-04 スケジュール一覧 / 編集</h3>
+<p><strong>目的</strong>: 行く日を決める(F01)。</p>
+<ul>
+<li>カレンダー or リスト表示。単発追加 / 繰り返し(曜日選択)</li>
+<li>各予定に時間帯。<strong>朝をデフォルト</strong>に寄せる UI</li>
+<li>予定からチェックリスト(SC-05)へ</li>
+</ul>
+<h3 id="sc-05-準備チェックリスト">SC-05 準備チェックリスト</h3>
+<ul>
+<li>選択した予定の項目を ON/OFF</li>
+<li>未達があれば前日アラートが飛ぶ旨を明示(§06 連動)</li>
+<li>「項目を編集」→ SC-06</li>
+</ul>
+<h3 id="sc-06-チェックリストテンプレート編集">SC-06 チェックリストテンプレート編集</h3>
+<ul>
+<li>項目の追加/削除/並べ替え(例: コワーキング予約済み?)</li>
+<li><code>PUT /checklist-templates</code></li>
+</ul>
+<h3 id="sc-07-記録入力-モーダル">SC-07 記録入力(モーダル)</h3>
+<p><strong>目的</strong>: 「行った証明」の確定(F03)。</p>
+<ul>
+<li><strong>記録する</strong>: メモ/タグ/時間(任意)→ <code>POST /records</code>(RECORDED)</li>
+<li><strong>行かなかった</strong>: <code>POST /records/skip</code>(SKIPPED)</li>
+<li>対象日が選べる(当日 / 過去のブランク日)</li>
+<li>状態遷移は <a href="02_function_design.html">02</a> §F03 に準拠</li>
+</ul>
+<h3 id="sc-08-成長・トロフィー">SC-08 成長・トロフィー</h3>
+<ul>
+<li>連続カウント・最長連続・累積回数</li>
+<li>現在ランクと<strong>次ランクまでの条件</strong></li>
+<li>記録推移グラフ(週次/月次)</li>
+<li>降格が起きた場合の表示(F05)</li>
+</ul>
+<h3 id="sc-09-チーム">SC-09 チーム</h3>
+<ul>
+<li>所属チームのメンバー進捗(連続・直近記録)</li>
+<li>チーム作成 / 招待コードで参加</li>
+<li>ランキングへ(SC-10)</li>
+</ul>
+<h3 id="sc-10-チーム内ランキング">SC-10 チーム内ランキング</h3>
+<ul>
+<li>指標(連続 or 期間内記録数)で順位表示</li>
+<li>自分の順位をハイライト</li>
+<li>全国順位は出さない(MVP スコープ外)</li>
+</ul>
+<h3 id="sc-11-設定">SC-11 設定</h3>
+<ul>
+<li>プロフィール(表示名・目的・目標頻度・既定時間帯)</li>
+<li>通知設定(リマインド時刻・前日アラート ON/OFF)</li>
+<li>サインアウト</li>
+</ul>
+<hr>
+<h2 id="4-状態・空表示">4. 状態・空表示</h2>
+<table>
+<thead>
+<tr>
+<th>画面</th>
+<th>空/異常時</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SC-01</td>
+<td>予定なし → 追加導線。記録ゼロ → 「最初の1回を記録しよう」</td>
+</tr>
+<tr>
+<td>SC-09</td>
+<td>未所属 → 作成/参加の二択を大きく</td>
+</tr>
+<tr>
+<td>SC-10</td>
+<td>メンバー1人 → 「仲間を招待しよう」</td>
+</tr>
+<tr>
+<td>全般</td>
+<td>オフライン → 再試行。記録送信失敗 → 再送導線(<a href="05_tech_stack.html">05</a> のリトライ方針)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="5-デザイン方針-mvp">5. デザイン方針(MVP)</h2>
+<ul>
+<li>iOS のネイティブ感を尊重しつつ、連続カウント/トロフィーは<strong>達成感が出る</strong>ビジュアルに</li>
+<li>朝の行動を促す配色・コピー(明るい・前向き)</li>
+<li>詳細なビジュアルデザイン(配色トークン・コンポーネント)は実装フェーズで Figma 等にて確定</li>
+</ul>
+
+        <nav class="pager"><a href="03_database_design.html"><div class="dir">← PREV</div><div class="t">03 DB設計</div></a><a href="05_tech_stack.html" class="next"><div class="dir">NEXT →</div><div class="t">05 技術スタック</div></a></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-画面一覧" class="toc-l2">1. 画面一覧</a>
+<a href="#2-ナビゲーション構造" class="toc-l2">2. ナビゲーション構造</a>
+<a href="#3-画面詳細" class="toc-l2">3. 画面詳細</a>
+<a href="#sc-01-ホーム" class="toc-l3">SC-01 ホーム</a>
+<a href="#sc-02-オンボーディング" class="toc-l3">SC-02 オンボーディング</a>
+<a href="#sc-03-サインイン" class="toc-l3">SC-03 サインイン</a>
+<a href="#sc-04-スケジュール一覧-編集" class="toc-l3">SC-04 スケジュール一覧 / 編集</a>
+<a href="#sc-05-準備チェックリスト" class="toc-l3">SC-05 準備チェックリスト</a>
+<a href="#sc-06-チェックリストテンプレート編集" class="toc-l3">SC-06 チェックリストテンプレート編集</a>
+<a href="#sc-07-記録入力-モーダル" class="toc-l3">SC-07 記録入力(モーダル)</a>
+<a href="#sc-08-成長・トロフィー" class="toc-l3">SC-08 成長・トロフィー</a>
+<a href="#sc-09-チーム" class="toc-l3">SC-09 チーム</a>
+<a href="#sc-10-チーム内ランキング" class="toc-l3">SC-10 チーム内ランキング</a>
+<a href="#sc-11-設定" class="toc-l3">SC-11 設定</a>
+<a href="#4-状態・空表示" class="toc-l2">4. 状態・空表示</a>
+<a href="#5-デザイン方針-mvp" class="toc-l2">5. デザイン方針(MVP)</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>

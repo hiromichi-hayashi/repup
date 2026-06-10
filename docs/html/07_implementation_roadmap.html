@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07 実装ロードマップ | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html" class="active"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 07</div>
+          <h1>実装ロードマップ</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: MVP の実装順序・依存関係・段階移行</p>
+<blockquote>
+<p>機能 ID は <a href="02_function_design.html">02 機能設計</a> に対応。</p>
+</blockquote>
+<hr>
+<h2 id="1-フェーズ全体像">1. フェーズ全体像</h2>
+<pre><code>[P0 基盤] → [P1 記録の核] → [P2 段取り] → [P3 報酬] → [P4 チーム] → [P5 仕上げ]
+                                                                  → [2nd 以降]
+</code></pre>
+<p>MVP は P0〜P5。GPS / 全国ランキング / 育成マッチョ / 外部連携は 2nd 以降。</p>
+<hr>
+<h2 id="2-スプリント計画">2. スプリント計画</h2>
+<h3 id="p0-基盤-土台">P0 — 基盤(土台)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>リポジトリ/モノレポ</td>
+<td>mobile(Expo)+ api(Hono)+ 共有 zod スキーマ</td>
+<td>—</td>
+</tr>
+<tr>
+<td>DB 接続</td>
+<td>Neon + Prisma(driver adapter)初期スキーマ</td>
+<td>03</td>
+</tr>
+<tr>
+<td>認証</td>
+<td>Better Auth(Apple + メール)</td>
+<td>BASE-01</td>
+</tr>
+<tr>
+<td>プロフィール/オンボーディング</td>
+<td><code>/me</code>・初期設定・Push トークン登録</td>
+<td>BASE-02</td>
+</tr>
+</tbody></table>
+<h3 id="p1-記録の核-最優先の価値">P1 — 記録の核(最優先の価値)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>記録 API</td>
+<td>RECORDED / SKIPPED / BLANK 状態遷移</td>
+<td>F03</td>
+</tr>
+<tr>
+<td>ホーム</td>
+<td>今日の状態・記録ボタン・連続カウント表示(暫定)</td>
+<td>SC-01</td>
+</tr>
+<tr>
+<td>記録入力</td>
+<td>記録する / 行かなかった</td>
+<td>SC-07</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>P1 完了時点で「記録して積み上がる」最小ループが動く。</p>
+</blockquote>
+<h3 id="p2-段取り-行かせる仕組み">P2 — 段取り(行かせる仕組み)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>スケジュール</td>
+<td>単発/繰り返し予定</td>
+<td>F01 / SC-04</td>
+</tr>
+<tr>
+<td>チェックリスト</td>
+<td>テンプレート + 予定実体</td>
+<td>F02 / SC-05,06</td>
+</tr>
+<tr>
+<td>通知基盤</td>
+<td>cron + Expo Push、N-01〜N-03、冪等性</td>
+<td>06</td>
+</tr>
+</tbody></table>
+<h3 id="p3-報酬-続ける動機">P3 — 報酬(続ける動機)</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>連続カウント確定ロジック</td>
+<td>許容範囲判定</td>
+<td>F04 §7.1</td>
+</tr>
+<tr>
+<td>トロフィー</td>
+<td>付与/降格(閾値確定)</td>
+<td>F04/F05</td>
+</tr>
+<tr>
+<td>成長画面</td>
+<td>グラフ・ランク・次条件</td>
+<td>SC-08</td>
+</tr>
+</tbody></table>
+<h3 id="p4-チーム">P4 — チーム</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>チーム CRUD</td>
+<td>作成/参加(招待コード)</td>
+<td>F06 / SC-09</td>
+</tr>
+<tr>
+<td>進捗共有</td>
+<td>メンバーの連続・直近記録</td>
+<td>F06</td>
+</tr>
+<tr>
+<td>チーム内ランキング</td>
+<td>指標・期間</td>
+<td>F06 / SC-10</td>
+</tr>
+</tbody></table>
+<h3 id="p5-仕上げ">P5 — 仕上げ</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>設定画面</td>
+<td>通知時刻・ON/OFF・サインアウト(SC-11)</td>
+</tr>
+<tr>
+<td>空/異常表示</td>
+<td>オフライン・記録再送・空状態</td>
+</tr>
+<tr>
+<td>計測</td>
+<td>成功指標(<a href="01_concept.html">01</a> §8)の計測埋め込み</td>
+</tr>
+<tr>
+<td>ベータ配信</td>
+<td>TestFlight</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="3-依存グラフ">3. 依存グラフ</h2>
+<pre><code>BASE-01 認証
+   └─ BASE-02 プロフィール
+         ├─ F03 記録 ──────────────┐
+         │     └─ F04 報酬 ── F05 ペナルティ
+         ├─ F01 スケジュール ── 06 通知 ── F02 チェックリスト
+         └─ F06 チーム(F03 の記録データに依存)
+</code></pre>
+<ul>
+<li><strong>F03(記録)が中心依存</strong>。報酬・チーム・ランキングはすべて記録データに依存する</li>
+<li>通知(06)は F01/F02 の後</li>
+</ul>
+<hr>
+<h2 id="4-段階移行-mvp-2nd">4. 段階移行(MVP → 2nd)</h2>
+<table>
+<thead>
+<tr>
+<th>2nd 機能</th>
+<th>前提・移行時の論点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GPS チェックイン</td>
+<td>位置許可・判定精度。F03 の「証明」を自己申告から拡張</td>
+</tr>
+<tr>
+<td>全国ランキング「日本で○位」</td>
+<td>一定のユーザー母数。集計バッチの追加</td>
+</tr>
+<tr>
+<td>育成マッチョ</td>
+<td>記録に連動するキャラ育成。記録データを流用</td>
+</tr>
+<tr>
+<td>LINE / カレンダー連携</td>
+<td>OAuth / Messaging API。通知経路の追加(06 を拡張)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>2nd の各機能は、それぞれ独立した spec → plan → 実装サイクルで進める。</p>
+</blockquote>
+<hr>
+<h2 id="5-開発規律">5. 開発規律</h2>
+<ul>
+<li>設計書を SSoT とし、<strong>実装が設計と食い違ったらコードを直す前に設計書を直す</strong></li>
+<li>未確定事項(<a href="02_function_design.html">02</a> §10 / <a href="05_tech_stack.html">05</a> §3 / <a href="06_notification_design.html">06</a> §8)は、着手前に確定して該当節を更新する</li>
+<li><code>main</code> に直 push しない / git hook を skip しない</li>
+</ul>
+
+        <nav class="pager"><a href="06_notification_design.html"><div class="dir">← PREV</div><div class="t">06 通知設計</div></a><span class="ph"></span></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-フェーズ全体像" class="toc-l2">1. フェーズ全体像</a>
+<a href="#2-スプリント計画" class="toc-l2">2. スプリント計画</a>
+<a href="#p0-基盤-土台" class="toc-l3">P0 — 基盤(土台)</a>
+<a href="#p1-記録の核-最優先の価値" class="toc-l3">P1 — 記録の核(最優先の価値)</a>
+<a href="#p2-段取り-行かせる仕組み" class="toc-l3">P2 — 段取り(行かせる仕組み)</a>
+<a href="#p3-報酬-続ける動機" class="toc-l3">P3 — 報酬(続ける動機)</a>
+<a href="#p4-チーム" class="toc-l3">P4 — チーム</a>
+<a href="#p5-仕上げ" class="toc-l3">P5 — 仕上げ</a>
+<a href="#3-依存グラフ" class="toc-l2">3. 依存グラフ</a>
+<a href="#4-段階移行-mvp-2nd" class="toc-l2">4. 段階移行(MVP → 2nd)</a>
+<a href="#5-開発規律" class="toc-l2">5. 開発規律</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>

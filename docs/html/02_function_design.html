@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>02 機能設計書 | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html" class="active"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 02</div>
+          <h1>機能設計書</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: BASE-01〜02 / F01〜F06 の機能仕様・API・状態遷移</p>
+<blockquote>
+<p>本書は <a href="01_concept.html">01 コンセプト</a> のスコープに従う。データ構造は <a href="03_database_design.html">03 DB設計</a>、画面は <a href="04_screen_design.html">04 画面設計</a> と相互参照する。</p>
+</blockquote>
+<hr>
+<h2 id="1-全体像">1. 全体像</h2>
+<h3 id="1-1-システム構成">1.1 システム構成</h3>
+<p>オンラインファースト。サーバーが真実のソース(SSoT)。端末はローカル DB を持たない。</p>
+<pre><code>[iOS / React Native + Expo]
+   │  HTTPS (JSON / REST)
+   ▼
+[API: Hono (TypeScript)]
+   │  Prisma
+   ▼
+[DB: Neon (PostgreSQL)]
+
+[cron] ──▶ リマインド/アラート判定 ──▶ [Expo Push] ──▶ 端末
+</code></pre>
+<p>技術選定の根拠と棄却理由は <a href="05_tech_stack.html">05 技術スタック</a>、通知の配信設計は <a href="06_notification_design.html">06 通知設計</a> を参照。</p>
+<h3 id="1-2-api-規約">1.2 API 規約</h3>
+<ul>
+<li>認証は Bearer トークン(Better Auth セッション)。<code>Authorization: Bearer &lt;token&gt;</code></li>
+<li>日時は <strong>内部 UTC / 表示 JST</strong>。API は ISO8601(UTC)で送受信</li>
+<li>スキーマは zod で定義し、リクエスト/レスポンスを検証</li>
+<li>エラーは <code>{ &quot;error&quot;: { &quot;code&quot;: string, &quot;message&quot;: string } }</code> 形式、HTTP ステータスを併用</li>
+</ul>
+<h3 id="1-3-機能一覧">1.3 機能一覧</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>機能</th>
+<th>主なエンドポイント</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BASE-01</td>
+<td>認証</td>
+<td><code>/auth/*</code>(Better Auth)</td>
+</tr>
+<tr>
+<td>BASE-02</td>
+<td>プロフィール/オンボーディング</td>
+<td><code>/me</code>, <code>/onboarding</code></td>
+</tr>
+<tr>
+<td>F01</td>
+<td>スケジュール&amp;リマインド</td>
+<td><code>/schedules</code></td>
+</tr>
+<tr>
+<td>F02</td>
+<td>準備チェックリスト</td>
+<td><code>/checklist-templates</code>, <code>/checklists</code></td>
+</tr>
+<tr>
+<td>F03</td>
+<td>記録</td>
+<td><code>/records</code></td>
+</tr>
+<tr>
+<td>F04</td>
+<td>報酬・積み重ね</td>
+<td><code>/me/stats</code>, <code>/trophies</code></td>
+</tr>
+<tr>
+<td>F05</td>
+<td>ペナルティ</td>
+<td>(F03/F04 に内包、cron で評価)</td>
+</tr>
+<tr>
+<td>F06</td>
+<td>チーム</td>
+<td><code>/teams</code>, <code>/teams/:id/members</code>, <code>/teams/:id/ranking</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-base-01-認証・アカウント">2. BASE-01 認証・アカウント</h2>
+<h3 id="2-1-要件">2.1 要件</h3>
+<ul>
+<li><strong>Sign in with Apple</strong> と <strong>メール(マジックリンク or パスワード)</strong> の 2 方式</li>
+<li>認証基盤は <strong>Better Auth</strong>(Hono + Prisma 統合)</li>
+<li>初回サインイン時に User レコードを作成し、オンボーディングへ誘導</li>
+</ul>
+<h3 id="2-2-エンドポイント">2.2 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*</code></td>
+<td><code>/auth/*</code></td>
+<td>Better Auth が提供(サインイン・コールバック・セッション)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/me</code></td>
+<td>現在のユーザー情報 + オンボーディング完了フラグ</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="3-base-02-プロフィール-オンボーディング">3. BASE-02 プロフィール / オンボーディング</h2>
+<h3 id="3-1-要件">3.1 要件</h3>
+<p>初回起動時に、動機づけの土台となる初期設定を行う。</p>
+<ul>
+<li><strong>目的</strong>(任意): 例「朝型にしたい」「継続したい」(自由記述 or 選択)</li>
+<li><strong>行く頻度の目安</strong>: 週 N 回(リマインド既定値に使う)</li>
+<li><strong>既定の時間帯</strong>: 朝 / 昼 / 夜(朝をデフォルト推奨として提示)</li>
+<li><strong>通知許可</strong>: Expo Push トークンの登録</li>
+</ul>
+<h3 id="3-2-エンドポイント">3.2 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/me</code></td>
+<td>プロフィール取得</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/me</code></td>
+<td>表示名・目的・目標頻度・既定時間帯の更新</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/onboarding/complete</code></td>
+<td>オンボーディング完了をマーク</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/me/push-token</code></td>
+<td>Expo Push トークンを登録/更新</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-f01-スケジュール-リマインド">4. F01 スケジュール &amp; リマインド</h2>
+<h3 id="4-1-要件">4.1 要件</h3>
+<p>「行く日」を事前に決め、当日(と前日)にプッシュで背中を押す。<strong>「いかなきゃ」を作る中核</strong>。</p>
+<ul>
+<li>単発予定(特定日)と、繰り返し(曜日指定の週次)の両対応</li>
+<li>予定ごとに時間帯(開始予定時刻)を持つ。朝をデフォルトに寄せる</li>
+<li>当日リマインド + 前日リマインド(チェックリスト未達アラートと連動、§F02)</li>
+</ul>
+<h3 id="4-2-データ">4.2 データ</h3>
+<p><code>Schedule</code>(詳細は <a href="03_database_design.html">03 DB設計</a> §Schedule)。繰り返しは <code>recurrenceRule</code>(曜日の集合)で表現し、cron が当日分の対象を展開する。</p>
+<h3 id="4-3-エンドポイント">4.3 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/schedules</code></td>
+<td>自分の予定一覧(期間指定可)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/schedules</code></td>
+<td>予定作成(単発 or 繰り返し)</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/schedules/:id</code></td>
+<td>予定変更</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/schedules/:id</code></td>
+<td>予定削除</td>
+</tr>
+</tbody></table>
+<h3 id="4-4-リマインド配信">4.4 リマインド配信</h3>
+<p>cron が定期実行し、対象予定を抽出して Expo Push を送る。配信タイミング・ペイロード・冪等性は <a href="06_notification_design.html">06 通知設計</a> に定義。</p>
+<hr>
+<h2 id="5-f02-準備チェックリスト">5. F02 準備チェックリスト</h2>
+<h3 id="5-1-要件">5.1 要件</h3>
+<p>行く前の段取りをアプリが持つ。「準備がだるい / 忘れる」への対策。</p>
+<ul>
+<li>ユーザーは<strong>チェック項目テンプレート</strong>を自由に編集(例: タオル、シューズ、<strong>コワーキングスペース予約済み?</strong>)</li>
+<li>予定(Schedule)に紐づくチェックリストを生成し、各項目を ON/OFF</li>
+<li><strong>前日</strong>時点で未達(未チェック項目あり)なら<strong>アラート</strong>を出す(§06)</li>
+</ul>
+<h3 id="5-2-データモデルの考え方">5.2 データモデルの考え方</h3>
+<ul>
+<li><code>ChecklistTemplateItem</code>: ユーザーごとの「項目の定義」(再利用される)</li>
+<li><code>Checklist</code> + <code>ChecklistItem</code>: 特定の予定に対する実体(チェック状態を持つ)</li>
+</ul>
+<p>予定を作ると、テンプレートから当該予定用のチェックリストが複製される。テンプレートを後で変えても過去の予定の実体は変わらない。</p>
+<h3 id="5-3-エンドポイント">5.3 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/checklist-templates</code></td>
+<td>テンプレート項目一覧</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/checklist-templates</code></td>
+<td>テンプレート項目の一括更新</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/schedules/:id/checklist</code></td>
+<td>予定のチェックリスト取得</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/checklists/:id/items/:itemId</code></td>
+<td>項目のチェック状態更新</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="6-f03-記録-行った証明">6. F03 記録(行った証明)</h2>
+<h3 id="6-1-要件">6.1 要件</h3>
+<p>MVP の「行った証明」は<strong>自己申告</strong>。記録の完了をもって「行った」とする。</p>
+<h3 id="6-2-状態遷移">6.2 状態遷移</h3>
+<p>予定日(または任意の日)ごとに、その日の状態は次のいずれか。</p>
+<pre><code>            ┌──────────┐
+            │  BLANK   │  予定日が来た / 任意日。まだ何も確定していない
+            └────┬─────┘
+       ┌─────────┴──────────┐
+       ▼                    ▼
+ 「記録する」           「行かなかった」
+       ▼                    ▼
+ ┌──────────┐         ┌──────────┐
+ │ RECORDED │         │  SKIPPED │
+ │ =行った   │         │ =サボり   │
+ └──────────┘         └──────────┘
+</code></pre>
+<ul>
+<li><strong>BLANK</strong>: 確定前。予定があったが未操作の状態。後から RECORDED / SKIPPED のどちらかに確定できる</li>
+<li><strong>RECORDED</strong>: 記録(内容入力)を完了 → <strong>「行った」</strong>。連続カウント・トロフィーに加算(§F04)</li>
+<li><strong>SKIPPED</strong>: 「行かなかった」を選択 → サボり。連続カウントを途切れさせ、降格評価の対象(§F05)</li>
+</ul>
+<blockquote>
+<p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。降格の評価対象にするかは §F05 で定義。</p>
+</blockquote>
+<h3 id="6-3-記録の内容-mvp">6.3 記録の内容(MVP)</h3>
+<ul>
+<li>必須: 実施日</li>
+<li>任意: メモ、種目/部位の簡易タグ、所要時間。<strong>MVP では軽量</strong>に保ち、習慣化の可視化を優先</li>
+</ul>
+<h3 id="6-4-エンドポイント">6.4 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/records</code></td>
+<td>自分の記録一覧(期間指定可)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/records</code></td>
+<td>記録を作成(= RECORDED に確定)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/records/skip</code></td>
+<td>指定日を SKIPPED に確定</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/records/:id</code></td>
+<td>記録の編集</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/records/:id</code></td>
+<td>記録の取り消し(RECORDED → BLANK へ戻す)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="7-f04-報酬・積み重ね">7. F04 報酬・積み重ね</h2>
+<h3 id="7-1-連続カウント-ストリーク">7.1 連続カウント(ストリーク)</h3>
+<ul>
+<li>直近の RECORDED が<strong>目標頻度の許容範囲内で続いている</strong>回数を「連続」として数える</li>
+<li>「○回連続いけてる!💪」をホームに表示(§04 SC-01)</li>
+<li>SKIPPED または許容範囲超過の空白で連続は途切れて 0 に戻る</li>
+</ul>
+<blockquote>
+<p>連続の単位は「週 N 回」設定に対する充足で判定する(毎日前提にしない)。具体的な閾値は実装時に確定し、本書 §7.1 を更新する。</p>
+</blockquote>
+<h3 id="7-2-トロフィー">7.2 トロフィー</h3>
+<p>累積記録数・連続記録に応じて <strong>ブロンズ / シルバー / ゴールド</strong> を付与する。</p>
+<table>
+<thead>
+<tr>
+<th>ランク</th>
+<th>例(累積/連続の目安)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ブロンズ</td>
+<td>初回〜継続の入口</td>
+</tr>
+<tr>
+<td>シルバー</td>
+<td>一定の累積 + 連続を達成</td>
+</tr>
+<tr>
+<td>ゴールド</td>
+<td>高い累積 + 長い連続を維持</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>付与・降格の具体閾値は実装時に確定し、表を更新する。降格は §F05。</p>
+</blockquote>
+<h3 id="7-3-成長グラフ">7.3 成長グラフ</h3>
+<ul>
+<li>記録回数の推移(週次/月次)を可視化し、「自分の成長具合が一目で見える」を満たす</li>
+</ul>
+<h3 id="7-4-エンドポイント">7.4 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/me/stats</code></td>
+<td>連続カウント・累積回数・現在ランク・推移データ</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/trophies</code></td>
+<td>保有トロフィー一覧と次ランクまでの条件</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="8-f05-ペナルティ">8. F05 ペナルティ</h2>
+<h3 id="8-1-要件">8.1 要件</h3>
+<p>サボりに痛みを持たせる。<strong>個人のトロフィー降格のみ</strong>(チームメンバーへの晒しは MVP では行わない)。</p>
+<ul>
+<li><strong>連続カウント途切れ</strong>: SKIPPED、または許容範囲を超えた空白で連続が 0 に戻る</li>
+<li><strong>トロフィー降格</strong>: サボりが続くと現在ランクが 1 段下がる(ゴールド→シルバー→ブロンズ)</li>
+</ul>
+<h3 id="8-2-評価タイミング">8.2 評価タイミング</h3>
+<ul>
+<li>連続途切れ: F03 の SKIPPED 確定時に即時評価</li>
+<li>降格: cron による定期評価(一定期間記録がない / SKIPPED 連続)で判定。具体条件は実装時に確定し本節を更新</li>
+</ul>
+<hr>
+<h2 id="9-f06-チーム">9. F06 チーム</h2>
+<h3 id="9-1-要件">9.1 要件</h3>
+<p>一人にしない。チームで進捗を共有し、<strong>チーム内ランキング</strong>で励む。</p>
+<ul>
+<li>チーム作成(作成者がオーナー)、招待コード or リンクで参加</li>
+<li>メンバーの<strong>進捗が見える</strong>(直近の記録状況・連続カウント)</li>
+<li><strong>チーム内ランキング</strong>(連続カウント or 期間内記録数で順位付け)</li>
+<li>MVP ではランキングは<strong>チーム内のみ</strong>。全国ランキングはスコープ外(<a href="01_concept.html">01</a> §7.3)</li>
+</ul>
+<h3 id="9-2-プライバシー">9.2 プライバシー</h3>
+<ul>
+<li>共有するのは記録の有無・回数・連続など<strong>進捗系のみ</strong>。記録メモ等の詳細は共有しない(MVP)</li>
+</ul>
+<h3 id="9-3-エンドポイント">9.3 エンドポイント</h3>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>パス</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/teams</code></td>
+<td>チーム作成</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/teams/:id</code></td>
+<td>チーム情報・メンバー進捗</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/teams/:id/join</code></td>
+<td>招待コードで参加</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/teams/:id/members/:userId</code></td>
+<td>脱退/除名</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/teams/:id/ranking</code></td>
+<td>チーム内ランキング(指標・期間指定)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="10-未確定事項">10. 未確定事項</h2>
+<p>実装着手前に確定し、本書と関連節を更新する。</p>
+<ul>
+<li>連続カウントの許容範囲ロジック(§7.1)</li>
+<li>トロフィーの付与・降格の具体閾値(§7.2 / §8.2)</li>
+<li>ランキング指標の既定(連続 or 期間内記録数)(§9.1)</li>
+</ul>
+
+        <nav class="pager"><a href="01_concept.html"><div class="dir">← PREV</div><div class="t">01 コンセプト</div></a><a href="03_database_design.html" class="next"><div class="dir">NEXT →</div><div class="t">03 DB設計</div></a></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-全体像" class="toc-l2">1. 全体像</a>
+<a href="#1-1-システム構成" class="toc-l3">1.1 システム構成</a>
+<a href="#1-2-api-規約" class="toc-l3">1.2 API 規約</a>
+<a href="#1-3-機能一覧" class="toc-l3">1.3 機能一覧</a>
+<a href="#2-base-01-認証・アカウント" class="toc-l2">2. BASE-01 認証・アカウント</a>
+<a href="#2-1-要件" class="toc-l3">2.1 要件</a>
+<a href="#2-2-エンドポイント" class="toc-l3">2.2 エンドポイント</a>
+<a href="#3-base-02-プロフィール-オンボーディング" class="toc-l2">3. BASE-02 プロフィール / オンボーディング</a>
+<a href="#3-1-要件" class="toc-l3">3.1 要件</a>
+<a href="#3-2-エンドポイント" class="toc-l3">3.2 エンドポイント</a>
+<a href="#4-f01-スケジュール-リマインド" class="toc-l2">4. F01 スケジュール  リマインド</a>
+<a href="#4-1-要件" class="toc-l3">4.1 要件</a>
+<a href="#4-2-データ" class="toc-l3">4.2 データ</a>
+<a href="#4-3-エンドポイント" class="toc-l3">4.3 エンドポイント</a>
+<a href="#4-4-リマインド配信" class="toc-l3">4.4 リマインド配信</a>
+<a href="#5-f02-準備チェックリスト" class="toc-l2">5. F02 準備チェックリスト</a>
+<a href="#5-1-要件" class="toc-l3">5.1 要件</a>
+<a href="#5-2-データモデルの考え方" class="toc-l3">5.2 データモデルの考え方</a>
+<a href="#5-3-エンドポイント" class="toc-l3">5.3 エンドポイント</a>
+<a href="#6-f03-記録-行った証明" class="toc-l2">6. F03 記録(行った証明)</a>
+<a href="#6-1-要件" class="toc-l3">6.1 要件</a>
+<a href="#6-2-状態遷移" class="toc-l3">6.2 状態遷移</a>
+<a href="#6-3-記録の内容-mvp" class="toc-l3">6.3 記録の内容(MVP)</a>
+<a href="#6-4-エンドポイント" class="toc-l3">6.4 エンドポイント</a>
+<a href="#7-f04-報酬・積み重ね" class="toc-l2">7. F04 報酬・積み重ね</a>
+<a href="#7-1-連続カウント-ストリーク" class="toc-l3">7.1 連続カウント(ストリーク)</a>
+<a href="#7-2-トロフィー" class="toc-l3">7.2 トロフィー</a>
+<a href="#7-3-成長グラフ" class="toc-l3">7.3 成長グラフ</a>
+<a href="#7-4-エンドポイント" class="toc-l3">7.4 エンドポイント</a>
+<a href="#8-f05-ペナルティ" class="toc-l2">8. F05 ペナルティ</a>
+<a href="#8-1-要件" class="toc-l3">8.1 要件</a>
+<a href="#8-2-評価タイミング" class="toc-l3">8.2 評価タイミング</a>
+<a href="#9-f06-チーム" class="toc-l2">9. F06 チーム</a>
+<a href="#9-1-要件" class="toc-l3">9.1 要件</a>
+<a href="#9-2-プライバシー" class="toc-l3">9.2 プライバシー</a>
+<a href="#9-3-エンドポイント" class="toc-l3">9.3 エンドポイント</a>
+<a href="#10-未確定事項" class="toc-l2">10. 未確定事項</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>

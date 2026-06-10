@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>05 技術スタック | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html" class="active"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 05</div>
+          <h1>技術スタック</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: 採用技術・選定根拠・棄却した選択肢</p>
+<hr>
+<h2 id="1-採用スタック">1. 採用スタック</h2>
+<table>
+<thead>
+<tr>
+<th>レイヤ</th>
+<th>採用</th>
+<th>補足</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>モバイル</td>
+<td><strong>React Native + Expo</strong></td>
+<td>iOS 優先。将来 Android も同コードで射程</td>
+</tr>
+<tr>
+<td>サーバー状態</td>
+<td><strong>TanStack Query</strong></td>
+<td>API キャッシュ。サーバーが SSoT</td>
+</tr>
+<tr>
+<td>プッシュ通知</td>
+<td><strong>Expo Notifications + Expo Push</strong></td>
+<td>生 APNs を避ける</td>
+</tr>
+<tr>
+<td>バックエンド</td>
+<td><strong>Hono(TypeScript)</strong></td>
+<td>既存資産(TS/Hono)が活きる</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td><strong>Prisma</strong></td>
+<td>Neon serverless driver adapter 利用</td>
+</tr>
+<tr>
+<td>DB</td>
+<td><strong>Neon(PostgreSQL)</strong></td>
+<td>サーバーレス。チーム集計を SQL で</td>
+</tr>
+<tr>
+<td>認証</td>
+<td><strong>Better Auth</strong></td>
+<td>Sign in with Apple + メール、Hono/Prisma 統合</td>
+</tr>
+<tr>
+<td>スケジューラ</td>
+<td><strong>cron</strong></td>
+<td>リマインド/アラート配信(§06)</td>
+</tr>
+<tr>
+<td>バリデーション</td>
+<td><strong>zod</strong></td>
+<td>API スキーマをフロント/バックで共有</td>
+</tr>
+</tbody></table>
+<p>ホスティングは後述(§3)。</p>
+<hr>
+<h2 id="2-各採用の理由">2. 各採用の理由</h2>
+<h3 id="2-1-react-native-expo">2.1 React Native + Expo</h3>
+<ul>
+<li>iOS 優先だが Android 展開の余地を残せる</li>
+<li><strong>Expo Notifications</strong> で生 APNs 証明書を扱わずプッシュを実装でき、リマインド中心の本アプリと相性が良い</li>
+<li>EAS によるクラウドビルドで Mac の Xcode 作業を最小化</li>
+</ul>
+<h3 id="2-2-オンラインファースト-tanstack-query">2.2 オンラインファースト + TanStack Query</h3>
+<ul>
+<li>チーム共有・サーバー集計のランキングがあるため、<strong>サーバーが真実のソース</strong>であるべき</li>
+<li>端末はキャッシュのみ持ち、ローカル DB の同期・衝突解決の複雑さを負わない</li>
+</ul>
+<h3 id="2-3-hono-prisma-neon">2.3 Hono + Prisma + Neon</h3>
+<ul>
+<li>Hono は TypeScript で軽量。既存の知見を活かせる</li>
+<li>Neon はサーバーレス Postgres。Prisma の <strong>Neon driver adapter</strong> で接続</li>
+<li>チーム内ランキング等のリレーショナル集計を SQL で素直に書ける</li>
+</ul>
+<h3 id="2-4-better-auth">2.4 Better Auth</h3>
+<ul>
+<li>Sign in with Apple とメールの両対応</li>
+<li>Hono / Prisma と統合でき、認証テーブルを Prisma 管理下に置ける</li>
+</ul>
+<hr>
+<h2 id="3-ホスティング-候補">3. ホスティング(候補)</h2>
+<table>
+<thead>
+<tr>
+<th>候補</th>
+<th>長所</th>
+<th>留意点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cloudflare Workers</strong>(推奨)</td>
+<td>Hono と好相性、Cron Triggers でリマインド配信が容易、スケール</td>
+<td>実行時間制約。Prisma は driver adapter 前提</td>
+</tr>
+<tr>
+<td>Render</td>
+<td>常駐サーバー・cron ジョブが分かりやすい</td>
+<td>スケール時コスト</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>最終決定は実装初期に PoC で確認し、本節を更新する。</p>
+</blockquote>
+<hr>
+<h2 id="4-記録送信のリトライ方針">4. 記録送信のリトライ方針</h2>
+<p>オンラインファーストだが、ジムの電波が悪い瞬間に「記録する」が失われると体験を損なう。</p>
+<ul>
+<li><strong>F03 の記録送信のみ</strong>、失敗時に端末側で<strong>リトライキュー</strong>(永続化)を持ち、復帰時に再送</li>
+<li>それ以外の操作は通常のオンライン送信(失敗時は再試行 UI)</li>
+<li>これはローカル DB による全体同期とは異なる、<strong>限定的な保険</strong></li>
+</ul>
+<hr>
+<h2 id="5-棄却した選択肢">5. 棄却した選択肢</h2>
+<p>設計判断の根拠として残す。</p>
+<h3 id="5-1-オフラインファースト-watermelondb-等-棄却">5.1 オフラインファースト(WatermelonDB 等)— 棄却</h3>
+<ul>
+<li>当初ローカル DB + 同期を検討したが、<strong>チーム共有・サーバー集計が前提</strong>のアプリでありオンラインが本質</li>
+<li>同期・衝突解決の複雑さに見合わない。記録送信の限定リトライ(§4)で必要十分</li>
+</ul>
+<h3 id="5-2-supabase-バックエンド一式-不採用">5.2 Supabase(バックエンド一式)— 不採用</h3>
+<ul>
+<li>認証/Postgres/cron が揃い MVP 構築は速いが、<strong>DB を Neon、バックエンドを Hono で自前管理</strong>する方針を採用</li>
+<li>既存の TS/Hono 資産を活かし、構成の主導権を握るため</li>
+</ul>
+<h3 id="5-3-firebase-firestore-棄却">5.3 Firebase / Firestore — 棄却</h3>
+<ul>
+<li>認証・FCM は手軽だが、<strong>Firestore(NoSQL)はチーム内ランキングのような集計が苦手</strong></li>
+<li>リレーショナルな集計を素直に書ける Postgres を優先</li>
+</ul>
+<h3 id="5-4-drizzle-orm-不採用">5.4 Drizzle(ORM)— 不採用</h3>
+<ul>
+<li>Neon と好相性で候補だったが、<strong>Prisma を採用</strong>(既存資産・スキーマ駆動の体験を優先、お手本プロジェクトとも体裁が揃う)</li>
+</ul>
+<h3 id="5-5-生-apns-直叩き-不採用">5.5 生 APNs 直叩き — 不採用</h3>
+<ul>
+<li>証明書管理が重い。<strong>Expo Push</strong> に委譲して実装を軽くする</li>
+</ul>
+<hr>
+<h2 id="6-コーディング規約-抜粋">6. コーディング規約(抜粋)</h2>
+<ul>
+<li>TypeScript でフロント/バック統一</li>
+<li>API スキーマは zod で定義し共有</li>
+<li>文字コード UTF-8 / 内部 UTC / 表示 JST</li>
+<li>命名: ファイル kebab-case / 関数・変数 camelCase / 型・コンポーネント PascalCase</li>
+<li>コメントは「なぜ非自明か」のみ</li>
+<li>機密情報を log/commit に出さない</li>
+</ul>
+
+        <nav class="pager"><a href="04_screen_design.html"><div class="dir">← PREV</div><div class="t">04 画面設計</div></a><a href="06_notification_design.html" class="next"><div class="dir">NEXT →</div><div class="t">06 通知設計</div></a></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-採用スタック" class="toc-l2">1. 採用スタック</a>
+<a href="#2-各採用の理由" class="toc-l2">2. 各採用の理由</a>
+<a href="#2-1-react-native-expo" class="toc-l3">2.1 React Native + Expo</a>
+<a href="#2-2-オンラインファースト-tanstack-query" class="toc-l3">2.2 オンラインファースト + TanStack Query</a>
+<a href="#2-3-hono-prisma-neon" class="toc-l3">2.3 Hono + Prisma + Neon</a>
+<a href="#2-4-better-auth" class="toc-l3">2.4 Better Auth</a>
+<a href="#3-ホスティング-候補" class="toc-l2">3. ホスティング(候補)</a>
+<a href="#4-記録送信のリトライ方針" class="toc-l2">4. 記録送信のリトライ方針</a>
+<a href="#5-棄却した選択肢" class="toc-l2">5. 棄却した選択肢</a>
+<a href="#5-1-オフラインファースト-watermelondb-等-棄却" class="toc-l3">5.1 オフラインファースト(WatermelonDB 等)— 棄却</a>
+<a href="#5-2-supabase-バックエンド一式-不採用" class="toc-l3">5.2 Supabase(バックエンド一式)— 不採用</a>
+<a href="#5-3-firebase-firestore-棄却" class="toc-l3">5.3 Firebase / Firestore — 棄却</a>
+<a href="#5-4-drizzle-orm-不採用" class="toc-l3">5.4 Drizzle(ORM)— 不採用</a>
+<a href="#5-5-生-apns-直叩き-不採用" class="toc-l3">5.5 生 APNs 直叩き — 不採用</a>
+<a href="#6-コーディング規約-抜粋" class="toc-l2">6. コーディング規約(抜粋)</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>

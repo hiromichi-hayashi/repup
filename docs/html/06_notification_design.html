@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>06 通知・リマインド設計 | RepUp 設計資料</title>
+<style>
+:root{
+  --ink:#16201a; --ink-soft:#3c4a42; --paper:#f5f3ee; --card:#fffdf8;
+  --green:#1f5d3a; --green2:#2f8a55; --line:#e3ddd0; --line2:#d3ccbb;
+  --accent:#c8551b; --code-bg:#16201a; --code-fg:#e7efe9;
+  --shadow:0 1px 3px rgba(22,32,26,.06),0 8px 24px rgba(22,32,26,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+  font-size:15.5px;line-height:1.85;-webkit-font-smoothing:antialiased;}
+.layout{display:flex;min-height:100vh}
+.side{width:248px;flex:0 0 248px;background:var(--green);color:#e7efe9;
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 0;}
+.brand{padding:0 26px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+.brand .logo{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:23px;font-weight:600;letter-spacing:.04em;color:#fff}
+.brand .tag{font-size:11.5px;color:#a7c9b4;margin-top:5px;letter-spacing:.04em}
+.brand .ver{font-size:10.5px;color:#86b099;margin-top:10px}
+.side a{display:flex;align-items:center;gap:11px;padding:11px 26px;color:#c3dccd;
+  text-decoration:none;font-size:13.5px;border-left:3px solid transparent;transition:.15s;}
+.side a:hover{background:rgba(255,255,255,.06);color:#fff}
+.side a.active{background:rgba(255,255,255,.10);color:#fff;border-left-color:var(--accent)}
+.nav-no{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:#86b099;font-weight:600}
+.side a.active .nav-no{color:var(--accent)}
+.side-foot{padding:18px 26px 0;margin-top:12px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#86b099;line-height:1.7}
+.main{flex:1;min-width:0;display:flex;justify-content:center;padding:0}
+.wrap{max-width:1180px;width:100%;display:grid;grid-template-columns:1fr 232px;gap:0}
+.content{padding:54px 56px 120px;min-width:0}
+.doc-head{margin-bottom:38px;padding-bottom:26px;border-bottom:2px solid var(--green)}
+.doc-head .kicker{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--green2);letter-spacing:.18em;font-weight:600}
+.doc-head h1{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:33px;line-height:1.3;margin:10px 0 0;color:var(--ink);font-weight:600;letter-spacing:.01em}
+.toc{position:sticky;top:0;align-self:start;padding:54px 24px 40px 8px;max-height:100vh;overflow-y:auto;font-size:12.5px}
+.toc-title{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--green2);font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.toc a{display:block;color:var(--ink-soft);text-decoration:none;padding:3px 0 3px 11px;border-left:2px solid var(--line2);line-height:1.5;transition:.15s}
+.toc a:hover{color:var(--green);border-left-color:var(--green2)}
+.toc a.toc-l3{padding-left:24px;font-size:11.5px;color:#7c8a80}
+.content h2{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:24px;margin:52px 0 18px;padding-top:14px;color:var(--green);font-weight:600;letter-spacing:.01em;border-top:1px solid var(--line)}
+.content h2:first-of-type{border-top:none;padding-top:0;margin-top:8px}
+.content h3{font-size:18.5px;margin:34px 0 12px;color:var(--ink);font-weight:600}
+.content h4{font-size:15.5px;margin:24px 0 8px;color:var(--accent);font-weight:700;letter-spacing:.02em}
+.content p{margin:13px 0;color:var(--ink-soft)}
+.content strong{color:var(--ink);font-weight:700}
+.content a{color:var(--green2);text-decoration:none;border-bottom:1px solid rgba(47,138,85,.3)}
+.content a:hover{border-bottom-color:var(--green2)}
+.content ul,.content ol{margin:13px 0;padding-left:24px;color:var(--ink-soft)}
+.content li{margin:5px 0}
+.content hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+.content code{font-family:"SFMono-Regular",Consolas,"Courier New",monospace;font-size:.86em;background:#ece6da;color:#9a4516;padding:2px 6px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:8px;overflow-x:auto;margin:18px 0;line-height:1.65;box-shadow:var(--shadow)}
+.content pre code{background:none;color:var(--code-fg);padding:0;font-size:13px}
+.content table{border-collapse:collapse;width:100%;margin:20px 0;font-size:13.5px;background:var(--card);box-shadow:var(--shadow);border-radius:8px;overflow:hidden}
+.content th{background:var(--green);color:#fff;text-align:left;padding:11px 14px;font-weight:600;font-size:13px;letter-spacing:.02em}
+.content td{padding:10px 14px;border-top:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.content tr:nth-child(even) td{background:rgba(227,221,208,.22)}
+.content blockquote{margin:18px 0;padding:14px 20px;background:#f3f7ee;border-left:4px solid var(--accent);border-radius:0 6px 6px 0;color:var(--ink-soft)}
+.content blockquote p{margin:6px 0}
+.content blockquote strong{color:var(--accent)}
+.pager{display:flex;justify-content:space-between;gap:16px;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
+.pager a{flex:1;text-decoration:none;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:8px;transition:.15s;box-shadow:var(--shadow)}
+.pager a:hover{border-color:var(--green2);transform:translateY(-1px)}
+.pager .dir{font-size:11px;color:var(--green2);font-family:monospace;letter-spacing:.1em}
+.pager .t{font-size:14.5px;color:var(--ink);font-weight:600;margin-top:3px}
+.pager .next{text-align:right}
+.pager .ph{flex:1}
+@media(max-width:1080px){.wrap{grid-template-columns:1fr}.toc{display:none}.content{padding:40px 32px 90px}}
+@media(max-width:720px){.side{position:fixed;z-index:50;transform:translateX(-100%);transition:.2s}.side.open{transform:none}.content{padding:32px 20px 80px}.menu-btn{display:flex!important}}
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:9px;background:var(--green);color:#fff;border:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">RepUp</div>
+      <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
+      <div class="ver">MVP 設計資料 / 全7文書</div>
+    </div>
+    <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
+<a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
+<a href="03_database_design.html"><span class="nav-no">03</span><span class="nav-t">DB設計</span></a>
+<a href="04_screen_design.html"><span class="nav-no">04</span><span class="nav-t">画面設計</span></a>
+<a href="05_tech_stack.html"><span class="nav-no">05</span><span class="nav-t">技術スタック</span></a>
+<a href="06_notification_design.html" class="active"><span class="nav-no">06</span><span class="nav-t">通知設計</span></a>
+<a href="07_implementation_roadmap.html"><span class="nav-no">07</span><span class="nav-t">ロードマップ</span></a></nav>
+    <div class="side-foot">設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。</div>
+  </aside>
+  <div class="main">
+    <div class="wrap">
+      <article class="content">
+        <div class="doc-head">
+          <div class="kicker">DOCUMENT 06</div>
+          <h1>通知・リマインド設計</h1>
+        </div>
+        <p><strong>バージョン</strong>: 1.0
+<strong>作成日</strong>: 2026年6月
+<strong>スコープ</strong>: プッシュ通知の種別・配信タイミング・cron・冪等性</p>
+<blockquote>
+<p>MVP の通知は <strong>iOS プッシュ(Expo Push)のみ</strong>。LINE / Google カレンダー連携はスコープ外(<a href="01_concept.html">01</a> §7.3)。</p>
+</blockquote>
+<hr>
+<h2 id="1-通知の種別">1. 通知の種別</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>通知</th>
+<th>トリガ</th>
+<th>対応機能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>N-01</td>
+<td>当日リマインド</td>
+<td>行く日の当日、設定時刻</td>
+<td>F01</td>
+</tr>
+<tr>
+<td>N-02</td>
+<td>前日リマインド</td>
+<td>行く日の前日</td>
+<td>F01</td>
+</tr>
+<tr>
+<td>N-03</td>
+<td>チェックリスト未達アラート</td>
+<td>前日時点で未チェック項目あり</td>
+<td>F02</td>
+</tr>
+<tr>
+<td>N-04</td>
+<td>連続途切れ警告(任意)</td>
+<td>連続が途切れそう/途切れた</td>
+<td>F04/F05</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>N-04 は MVP では任意。最小は N-01〜N-03。</p>
+</blockquote>
+<hr>
+<h2 id="2-配信アーキテクチャ">2. 配信アーキテクチャ</h2>
+<pre><code>[cron] 定期実行(例: 5〜15分間隔)
+   │  対象抽出: Schedule + Checklist + User設定 + PushToken
+   ▼
+[配信判定] 送る/送らない・冪等性チェック(NotificationLog)
+   │
+   ▼
+[Expo Push API] へバッチ送信
+   │
+   ▼
+端末(iOS)に通知表示
+</code></pre>
+<ul>
+<li>cron は <strong>Cloudflare Cron Triggers</strong>(Workers 採用時)または <strong>Render Cron</strong></li>
+<li>送信は Expo Push のバッチ API を利用</li>
+</ul>
+<hr>
+<h2 id="3-タイミング定義">3. タイミング定義</h2>
+<table>
+<thead>
+<tr>
+<th>通知</th>
+<th>既定タイミング</th>
+<th>ユーザー調整</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>N-01 当日</td>
+<td>予定の <code>startTime</code>、無ければ時間帯の既定(朝=例 7:00)</td>
+<td>設定で時刻変更可</td>
+</tr>
+<tr>
+<td>N-02 前日</td>
+<td>前日の夜(例 20:00)</td>
+<td>ON/OFF 可</td>
+</tr>
+<tr>
+<td>N-03 チェックリスト</td>
+<td>前日の夜(N-02 と同時 or 直後)</td>
+<td>ON/OFF 可</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>既定時刻の具体値は実装時に確定し本表を更新する。時刻は <strong>JST 表示 / UTC 保存</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="4-対象抽出ロジック">4. 対象抽出ロジック</h2>
+<p>cron 実行ごとに、現在時刻(UTC)を基準に以下を抽出する。</p>
+<ol>
+<li><strong>当日リマインド(N-01)</strong>: 今日が <code>Schedule.date</code>、または繰り返しルールに今日の曜日が含まれ <code>active=true</code> の予定。配信予定時刻に達したもの</li>
+<li><strong>前日リマインド(N-02)</strong>: 明日が対象日の予定。前日配信時刻に達したもの</li>
+<li><strong>チェックリスト未達(N-03)</strong>: N-02 対象のうち、紐づく <code>Checklist</code> に <code>checked=false</code> の項目が残るもの</li>
+<li>各対象ユーザーの有効な <code>PushToken</code> を解決</li>
+</ol>
+<hr>
+<h2 id="5-冪等性-二重送信の防止">5. 冪等性(二重送信の防止)</h2>
+<p>cron は短間隔で回るため、同じ通知を二重に送らない仕組みが要る。</p>
+<ul>
+<li><code>NotificationLog(userId, scheduleId, type, targetDate)</code> を一意キーにして送信記録を残す</li>
+<li>送信前に存在チェック → 無ければ送信し記録を作成</li>
+<li>送信失敗は記録せず次回 cron で再試行</li>
+</ul>
+<h3 id="5-1-notificationlog-テーブル追加">5.1 NotificationLog(テーブル追加)</h3>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>型</th>
+<th>制約</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>text</td>
+<td>PK</td>
+<td></td>
+</tr>
+<tr>
+<td>userId</td>
+<td>text</td>
+<td>FK→User</td>
+<td></td>
+</tr>
+<tr>
+<td>scheduleId</td>
+<td>text</td>
+<td>FK→Schedule, null可</td>
+<td></td>
+</tr>
+<tr>
+<td>type</td>
+<td>enum</td>
+<td></td>
+<td>N01/N02/N03/N04</td>
+</tr>
+<tr>
+<td>targetDate</td>
+<td>date</td>
+<td></td>
+<td>対象日</td>
+</tr>
+<tr>
+<td>sentAt</td>
+<td>timestamptz</td>
+<td>default now</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>制約: <code>(userId, scheduleId, type, targetDate)</code> で一意。</p>
+<blockquote>
+<p><a href="03_database_design.html">03 DB設計</a> に本テーブルを追補する。</p>
+</blockquote>
+<hr>
+<h2 id="6-通知ペイロード-例">6. 通知ペイロード(例)</h2>
+<pre><code class="language-json">{
+  &quot;to&quot;: &quot;ExpoPushToken[xxx]&quot;,
+  &quot;title&quot;: &quot;今日は朝ジムの日 💪&quot;,
+  &quot;body&quot;: &quot;そのまま仕事に行く流れ、作っていこう&quot;,
+  &quot;data&quot;: { &quot;type&quot;: &quot;N01&quot;, &quot;scheduleId&quot;: &quot;sch_123&quot;, &quot;targetDate&quot;: &quot;2026-06-11&quot; }
+}
+</code></pre>
+<ul>
+<li><code>data.type</code> と <code>scheduleId</code> で、タップ時にホーム(SC-01)や記録(SC-07)へディープリンク</li>
+<li>N-03 は本文に未達項目数を含める(例: 「準備が2つ残っています」)</li>
+</ul>
+<hr>
+<h2 id="7-権限・失敗時">7. 権限・失敗時</h2>
+<ul>
+<li>通知許可はオンボーディング(SC-02)で取得。未許可なら設定(SC-11)から再取得導線</li>
+<li>Expo Push が <code>DeviceNotRegistered</code> を返したトークンは無効化(<code>PushToken</code> を削除/失効)</li>
+<li>配信失敗はログのみ。ユーザー操作はブロックしない</li>
+</ul>
+<hr>
+<h2 id="8-未確定事項">8. 未確定事項</h2>
+<ul>
+<li>各通知の既定時刻の具体値(§3)</li>
+<li>cron 実行間隔(§2)</li>
+<li>N-04(連続途切れ警告)を MVP に含めるか(§1)</li>
+</ul>
+
+        <nav class="pager"><a href="05_tech_stack.html"><div class="dir">← PREV</div><div class="t">05 技術スタック</div></a><a href="07_implementation_roadmap.html" class="next"><div class="dir">NEXT →</div><div class="t">07 ロードマップ</div></a></nav>
+      </article>
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#1-通知の種別" class="toc-l2">1. 通知の種別</a>
+<a href="#2-配信アーキテクチャ" class="toc-l2">2. 配信アーキテクチャ</a>
+<a href="#3-タイミング定義" class="toc-l2">3. タイミング定義</a>
+<a href="#4-対象抽出ロジック" class="toc-l2">4. 対象抽出ロジック</a>
+<a href="#5-冪等性-二重送信の防止" class="toc-l2">5. 冪等性(二重送信の防止)</a>
+<a href="#5-1-notificationlog-テーブル追加" class="toc-l3">5.1 NotificationLog(テーブル追加)</a>
+<a href="#6-通知ペイロード-例" class="toc-l2">6. 通知ペイロード(例)</a>
+<a href="#7-権限・失敗時" class="toc-l2">7. 権限・失敗時</a>
+<a href="#8-未確定事項" class="toc-l2">8. 未確定事項</a>
+      </aside>
+    </div>
+  </div>
+</div>
+</body>
+</html>
