@@ -164,7 +164,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>F04</td>
 <td>報酬・ペナルティ</td>
-<td><code>/account/stats</code>, <code>/trophies</code></td>
+<td><code>/account/stats</code>, <code>/rank/me</code></td>
 </tr>
 <tr>
 <td>F06</td>
@@ -558,6 +558,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>一度上げたトロフィーランクはシーズン中は下がらない。リセットは<strong>シーズン境界(年次)のみ</strong>(§7.2)</li>
 </ul>
 <h3 id="7-5-エンドポイント">7.5 エンドポイント</h3>
+<p>ランクは<strong>ユーザーに紐づく独立リソース</strong> <code>rank</code> として扱う。自分・チーム・(将来の)全国ランキングを同じ土台から引けるようにするため、<code>/account</code> 配下に閉じない。</p>
 <table>
 <thead>
 <tr>
@@ -569,14 +570,22 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td>GET</td>
 <td><code>/account/stats</code></td>
-<td>連続カウント・シーズン内最高連続・現在ランク・シーズン情報・累積・推移</td>
+<td>連続カウント・シーズン内最高連続・累積・推移グラフ</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/trophies</code></td>
-<td>現在ランクと次ランクまでの条件 + 過去シーズンの最高ランク履歴</td>
+<td><code>/rank/me</code></td>
+<td>自分のランク: 現在ランク・次ランクまでの条件・シーズン履歴</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/rank/users/:userId</code></td>
+<td>指定ユーザーのランク(チーム表示などで使用)</td>
 </tr>
 </tbody></table>
+<blockquote>
+<p>ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§8.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
+</blockquote>
 <hr>
 <h2 id="8-f06-チーム">8. F06 チーム</h2>
 <h3 id="8-1-要件">8.1 要件</h3>
@@ -584,7 +593,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li>チーム作成(作成者がオーナー)、招待コード or リンクで参加</li>
 <li>メンバーの<strong>進捗が見える</strong>(直近の記録状況・連続カウント)</li>
-<li><strong>チーム内ランキング</strong>(連続カウント or 期間内記録数で順位付け)</li>
+<li><strong>チーム内ランキング</strong>(指標は連続カウント / 期間内記録数 / ランク のいずれか。既定は §9 で確定)。メンバーのユーザー紐づきランク(§7.5)を集約して構成</li>
 <li>ランキングは<strong>チーム内のみ</strong>(対象外は <a href="01_concept.html">01</a> §7.3)</li>
 </ul>
 <h3 id="8-2-プライバシー">8.2 プライバシー</h3>
@@ -623,7 +632,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>GET</td>
 <td><code>/teams/:id/ranking</code></td>
-<td>チーム内ランキング(指標・期間指定)</td>
+<td>チーム内ランキング(メンバーのランク/連続を集約・指標/期間指定)</td>
 </tr>
 </tbody></table>
 <hr>
@@ -631,7 +640,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p>実装着手前に確定し、本書と関連節を更新する。</p>
 <ul>
 <li><strong>トロフィー(ランク)の詳細</strong>(§7.2)— <strong>後日決定</strong>。骨子(シーズン制・6 段階・昇格のみ・年次リセット)は合意済み。<strong>閾値・頻度別の到達上限・シーズンの期間と境界</strong>は未定</li>
-<li>ランキング指標の既定(連続 or 期間内記録数)(§8.1)</li>
+<li>ランキング指標の既定(連続 / 期間内記録数 / ランク)(§8.1)</li>
 </ul>
 <blockquote>
 <p>連続カウント(§7.1)のロジックは<strong>確定済み</strong>。トロフィー(§7.2)は骨子のみ合意で、詳細は後日確定。</p>
