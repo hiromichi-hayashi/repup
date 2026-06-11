@@ -164,7 +164,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>F04</td>
 <td>報酬・ペナルティ</td>
-<td><code>/account/stats</code>, <code>/rank/me</code></td>
+<td><code>/account/stats</code>, <code>/rank/users/:userId</code></td>
 </tr>
 <tr>
 <td>F06</td>
@@ -574,17 +574,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/rank/me</code></td>
-<td>自分のランク: 現在ランク・次ランクまでの条件・シーズン履歴</td>
-</tr>
-<tr>
-<td>GET</td>
 <td><code>/rank/users/:userId</code></td>
-<td>指定ユーザーのランク(チーム表示などで使用)</td>
+<td>指定ユーザーのランク: 現在ランク・次ランクまでの条件・シーズン履歴</td>
 </tr>
 </tbody></table>
 <blockquote>
-<p>ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§8.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
+<p>自分のランクは自分の <code>userId</code>(<code>/account</code> で取得済み)で引く。専用の <code>/rank/me</code> は持たない。
+ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§8.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
 </blockquote>
 <hr>
 <h2 id="8-f06-チーム">8. F06 チーム</h2>

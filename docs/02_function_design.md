@@ -46,7 +46,7 @@
 | F01 | スケジュール&リマインド | `/schedules` |
 | F02 | 準備チェックリスト | `/checklist-templates`, `/checklists` |
 | F03 | 記録 | `/records` |
-| F04 | 報酬・ペナルティ | `/account/stats`, `/rank/me` |
+| F04 | 報酬・ペナルティ | `/account/stats`, `/rank/users/:userId` |
 | F06 | チーム | `/teams`, `/teams/:id/members`, `/teams/:id/ranking` |
 
 ---
@@ -329,9 +329,9 @@ MVP の「行った証明」は**自己申告**。記録の完了をもって「
 | メソッド | パス | 説明 |
 |---|---|---|
 | GET | `/account/stats` | 連続カウント・シーズン内最高連続・累積・推移グラフ |
-| GET | `/rank/me` | 自分のランク: 現在ランク・次ランクまでの条件・シーズン履歴 |
-| GET | `/rank/users/:userId` | 指定ユーザーのランク(チーム表示などで使用) |
+| GET | `/rank/users/:userId` | 指定ユーザーのランク: 現在ランク・次ランクまでの条件・シーズン履歴 |
 
+> 自分のランクは自分の `userId`(`/account` で取得済み)で引く。専用の `/rank/me` は持たない。
 > ランクの真実は `UserStats`(ユーザー単位の `currentRank` / `seasonBestStreak`)+ `Trophy`(シーズン履歴)。**チーム内ランキング**(§8.3 `/teams/:id/ranking`)や**全国ランキング**(2nd, [01](01_concept.html) §7.3)は、このユーザー紐づきランクを**集約**して構成する。
 
 ---
