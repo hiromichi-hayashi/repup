@@ -460,6 +460,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>予定日でない火曜に行って記録 → 連続は変わらず(ボーナス)</li>
 </ul>
 <h3 id="7-2-トロフィー-シーズン制ランク">7.2 トロフィー(シーズン制ランク)</h3>
+<blockquote>
+<p><strong>⚠ 本節の詳細(閾値・頻度別の到達上限・シーズンの期間と境界)は暫定で、後日確定する(§9)。</strong> 骨子=「シーズン制・6 段階・昇格のみ・年次リセット」は合意済み。以下の数値は方向性を示す提案。</p>
+</blockquote>
 <p>ゲームのシーズンランクのように、<strong>連続カウントの最高到達でランクが上がり、シーズン中は下がらない</strong>(昇格のみ・降格なし)。シーズン(既定 1 年)が替わるとリセットし、新シーズンを始める。</p>
 <h4>ランク(6 段階)</h4>
 <p>連続(§7.1)の<strong>シーズン内最高値</strong> <code>seasonBestStreak</code> が閾値に達するとそのランクへ昇格する。</p>
@@ -627,11 +630,11 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="9-未確定事項">9. 未確定事項</h2>
 <p>実装着手前に確定し、本書と関連節を更新する。</p>
 <ul>
+<li><strong>トロフィー(ランク)の詳細</strong>(§7.2)— <strong>後日決定</strong>。骨子(シーズン制・6 段階・昇格のみ・年次リセット)は合意済み。<strong>閾値・頻度別の到達上限・シーズンの期間と境界</strong>は未定</li>
 <li>ランキング指標の既定(連続 or 期間内記録数)(§8.1)</li>
-<li>シーズンの期間と境界(既定 1 年=カレンダー年。リセット日時の扱い)(§7.2)</li>
 </ul>
 <blockquote>
-<p>連続カウント(§7.1)・トロフィー(シーズン制ランク, §7.2)のロジックは<strong>確定済み</strong>。トロフィー閾値は提案値で運用調整可。</p>
+<p>連続カウント(§7.1)のロジックは<strong>確定済み</strong>。トロフィー(§7.2)は骨子のみ合意で、詳細は後日確定。</p>
 </blockquote>
 
         <nav class="pager"><a href="01_concept.html"><div class="dir">← PREV</div><div class="t">01 コンセプト</div></a><a href="03_database_design.html" class="next"><div class="dir">NEXT →</div><div class="t">03 DB設計</div></a></nav>
