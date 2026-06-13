@@ -84,7 +84,7 @@
 
 ### 5.2 Supabase(バックエンド一式)— 不採用
 
-- 認証/Postgres/cron が揃い MVP 構築は速いが、**DB を Neon、バックエンドを Hono で自前管理**する方針を採用
+- 認証/Postgres/cron が揃い初期構築は速いが、**DB を Neon、バックエンドを Hono で自前管理**する方針を採用
 - 既存の TS/Hono 資産を活かし、構成の主導権を握るため
 
 ### 5.3 Firebase / Firestore — 棄却

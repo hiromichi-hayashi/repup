@@ -81,7 +81,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
     <div class="brand">
       <div class="logo">RepUp</div>
       <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
-      <div class="ver">MVP 設計資料 / 全7文書</div>
+      <div class="ver">設計資料 / 全7文書</div>
     </div>
     <nav><a href="01_concept.html" class="active"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
 <a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
@@ -101,13 +101,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
         </div>
         <p><strong>バージョン</strong>: 1.0
 <strong>作成日</strong>: 2026年6月
-<strong>スコープ</strong>: MVP のコンセプト・課題・ゴール・機能スコープの定義</p>
+<strong>スコープ</strong>: コンセプト・課題・ゴール・機能スコープの定義</p>
 <blockquote>
 <p><strong>RepUp</strong> — 筋トレの「Rep(回数)」を積み「Up」する。行かなきゃの気持ちを仕組みで作り、朝ジム習慣へのシフトを支えるアプリ。</p>
 </blockquote>
 <hr>
 <h2 id="1-このドキュメントの位置づけ">1. このドキュメントの位置づけ</h2>
-<p>本書は RepUp の <strong>Single Source of Truth(SSoT)の起点</strong>である。なぜ作るのか・誰の何を解決するのか・MVP に何を入れて何を入れないかを定義する。以降の機能設計(02)・DB設計(03)・画面設計(04)はすべて本書のスコープに従う。</p>
+<p>本書は RepUp の <strong>Single Source of Truth(SSoT)の起点</strong>である。なぜ作るのか・誰の何を解決するのか・何を入れて何を入れないか(スコープ)を定義する。以降の機能設計(02)・DB設計(03)・画面設計(04)はすべて本書のスコープに従う。</p>
 <p>実装と設計が食い違ったら、<strong>コードを直す前に設計書を直す</strong>。</p>
 <hr>
 <h2 id="2-背景-as-is-現状の課題">2. 背景 — As-Is(現状の課題)</h2>
@@ -181,7 +181,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li>チームを作る / 参加する</li>
 <li>メンバーが行く日・進捗が見える</li>
-<li><strong>チーム内ランキング</strong>で互いに励む(MVP のランキングはチーム内のみ)</li>
+<li><strong>チーム内ランキング</strong>で互いに励む(ランキングはチーム内のみ)</li>
 </ul>
 <h3 id="4-5-時間帯の提案-任意・仮説">4.5 時間帯の提案(任意・仮説)</h3>
 <p>「いつ行くか」はユーザーが自由に選ぶ。そのうえで、ブレストで挙がった「朝に行く」利点を、<strong>強制せず任意の提案</strong>として提示できる。</p>
@@ -193,7 +193,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p>これは検証対象の<strong>仮説</strong>であって、ゴール(§3)ではない。アプリは時間帯を中立に扱い、朝は「選べる選択肢の一つとして軽く勧める」程度にとどめる(オンボーディングの既定提案・既定時間帯)。夜に行きたい人を妨げない。</p>
 <hr>
 <h2 id="5-「行った証明」の扱い">5. 「行った証明」の扱い</h2>
-<p>MVP では <strong>自己申告</strong>とする。</p>
+<p><strong>自己申告</strong>とする。</p>
 <ul>
 <li><strong>記録が完了したら「行った」ことになる</strong></li>
 <li>行っていない日は<strong>ブランク状態</strong>として保持され、後から <strong>「記録する」か「行かなかった」か</strong>を選んで確定できる</li>
@@ -247,7 +247,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>アカウント情報 + 個人の目標設定(目的・通う日・既定時間帯・通知許可)</td>
 </tr>
 </tbody></table>
-<h3 id="7-2-mvp-機能">7.2 MVP 機能</h3>
+<h3 id="7-2-対象機能">7.2 対象機能</h3>
 <table>
 <thead>
 <tr>
@@ -278,7 +278,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </tbody></table>
 <h3 id="7-3-対象外-na-2nd-以降">7.3 対象外(NA / 2nd 以降)</h3>
-<p>以下は <strong>MVP では実装しない</strong>。本節を対象外の<strong>唯一の根拠</strong>とし、他文書・他節では個別に「スコープ外」を散発的に書かない(必要なときは本節を参照する)。</p>
+<p>以下は <strong>今回は実装しない</strong>。本節を対象外の<strong>唯一の根拠</strong>とし、他文書・他節では個別に「スコープ外」を散発的に書かない(必要なときは本節を参照する)。</p>
 <table>
 <thead>
 <tr>
@@ -290,12 +290,12 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td>GPS チェックイン</td>
 <td>位置で「行った」を自動判定</td>
-<td>MVP は自己申告(§5)。位置許可・判定精度の検証が必要</td>
+<td>今回は自己申告(§5)。位置許可・判定精度の検証が必要</td>
 </tr>
 <tr>
 <td>全国ランキング / 「日本人の中で○位」</td>
 <td>全ユーザー横断の順位</td>
-<td>一定のユーザー母数が前提。MVP はチーム内ランキングのみ</td>
+<td>一定のユーザー母数が前提。今回はチーム内ランキングのみ</td>
 </tr>
 <tr>
 <td>育成マッチョ</td>
@@ -305,12 +305,12 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>LINE / Google カレンダー連携</td>
 <td>外部経路のリマインド</td>
-<td>MVP は iOS プッシュのみ。OAuth / 各 API 連携が必要</td>
+<td>今回は iOS プッシュのみ。OAuth / 各 API 連携が必要</td>
 </tr>
 <tr>
 <td>チームへの「晒し」ペナルティ</td>
 <td>未達をチームに通知</td>
-<td>MVP のペナルティは個人の連続リセットに留める。関係性リスクを避ける</td>
+<td>ペナルティは個人の連続リセットに留める。関係性リスクを避ける</td>
 </tr>
 <tr>
 <td>準備チェックリスト</td>
@@ -322,7 +322,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p>2nd の各項目は、それぞれ独立した spec → plan → 実装サイクルで進める(→ <a href="07_implementation_roadmap.html">07 ロードマップ</a> §4)。</p>
 </blockquote>
 <hr>
-<h2 id="8-成功の判断材料-mvp">8. 成功の判断材料(MVP)</h2>
+<h2 id="8-成功の判断材料">8. 成功の判断材料</h2>
 <table>
 <thead>
 <tr>
@@ -340,7 +340,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </tbody></table>
 <blockquote>
-<p>数値目標は MVP リリース後の実データで設定する。本書では「何を見るか」までを定義する。</p>
+<p>数値目標はリリース後の実データで設定する。本書では「何を見るか」までを定義する。</p>
 </blockquote>
 
         <nav class="pager"><span class="ph"></span><a href="02_function_design.html" class="next"><div class="dir">NEXT →</div><div class="t">02 機能設計</div></a></nav>
@@ -361,9 +361,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#6-ペルソナ" class="toc-l2">6. ペルソナ</a>
 <a href="#7-機能スコープ" class="toc-l2">7. 機能スコープ</a>
 <a href="#7-1-ベース機能" class="toc-l3">7.1 ベース機能</a>
-<a href="#7-2-mvp-機能" class="toc-l3">7.2 MVP 機能</a>
+<a href="#7-2-対象機能" class="toc-l3">7.2 対象機能</a>
 <a href="#7-3-対象外-na-2nd-以降" class="toc-l3">7.3 対象外(NA / 2nd 以降)</a>
-<a href="#8-成功の判断材料-mvp" class="toc-l2">8. 成功の判断材料(MVP)</a>
+<a href="#8-成功の判断材料" class="toc-l2">8. 成功の判断材料</a>
       </aside>
     </div>
   </div>

@@ -12,7 +12,7 @@ const OUT = join(DOCS, 'html');
 const BRAND = {
   logo: 'RepUp',
   tag: '筋トレを、いかなきゃの気持ちに。',
-  ver: 'MVP 設計資料 / 全7文書',
+  ver: '設計資料 / 全7文書',
   foot: '設計書は相互整合済み。技術スタック・通知設計・ロードマップはこれに準拠。',
 };
 

@@ -4,7 +4,7 @@
 
 **バージョン**: 1.0
 **作成日**: 2026年6月
-**スコープ**: MVP の Prisma スキーマ / テーブル定義
+**スコープ**: Prisma スキーマ / テーブル定義
 
 > DB は **Neon(PostgreSQL)**、ORM は **Prisma**(Neon serverless driver adapter)。機能との対応は [02 機能設計](02_function_design.html) を参照。
 
@@ -100,7 +100,7 @@ Expo Push トークン(端末ごと)。
 | date | date | | 実施(対象)日 |
 | status | enum | | RECORDED / SKIPPED |
 | scheduleId | text | FK→Schedule, null可 | 紐づく予定(任意日記録は null) |
-| memo | text | null可 | メモ(MVP 任意) |
+| memo | text | null可 | メモ(任意) |
 | tags | text[] | null可 | 部位/種目タグ(任意) |
 | durationMin | int | null可 | 所要時間(任意) |
 | createdAt | timestamptz | default now | |
@@ -222,7 +222,7 @@ model Record {
 }
 ```
 
-> 全 model の完全版は実装時に `schema.prisma` として確定する。本書は MVP に必要なテーブルと主要カラム・制約を定義する。
+> 全 model の完全版は実装時に `schema.prisma` として確定する。本書は必要なテーブルと主要カラム・制約を定義する。
 
 ---
 

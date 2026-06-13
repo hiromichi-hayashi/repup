@@ -81,7 +81,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
     <div class="brand">
       <div class="logo">RepUp</div>
       <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
-      <div class="ver">MVP 設計資料 / 全7文書</div>
+      <div class="ver">設計資料 / 全7文書</div>
     </div>
     <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
 <a href="02_function_design.html"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
@@ -101,7 +101,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
         </div>
         <p><strong>バージョン</strong>: 1.0
 <strong>作成日</strong>: 2026年6月
-<strong>スコープ</strong>: MVP の Prisma スキーマ / テーブル定義</p>
+<strong>スコープ</strong>: Prisma スキーマ / テーブル定義</p>
 <blockquote>
 <p>DB は <strong>Neon(PostgreSQL)</strong>、ORM は <strong>Prisma</strong>(Neon serverless driver adapter)。機能との対応は <a href="02_function_design.html">02 機能設計</a> を参照。</p>
 </blockquote>
@@ -347,7 +347,7 @@ User 1──n NotificationLog
 <td>memo</td>
 <td>text</td>
 <td>null可</td>
-<td>メモ(MVP 任意)</td>
+<td>メモ(任意)</td>
 </tr>
 <tr>
 <td>tags</td>
@@ -651,7 +651,7 @@ model Record {
 }
 </code></pre>
 <blockquote>
-<p>全 model の完全版は実装時に <code>schema.prisma</code> として確定する。本書は MVP に必要なテーブルと主要カラム・制約を定義する。</p>
+<p>全 model の完全版は実装時に <code>schema.prisma</code> として確定する。本書は必要なテーブルと主要カラム・制約を定義する。</p>
 </blockquote>
 <hr>
 <h2 id="5-インデックス方針">5. インデックス方針</h2>

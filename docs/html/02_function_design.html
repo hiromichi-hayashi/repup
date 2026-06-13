@@ -81,7 +81,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
     <div class="brand">
       <div class="logo">RepUp</div>
       <div class="tag">筋トレを、いかなきゃの気持ちに。</div>
-      <div class="ver">MVP 設計資料 / 全7文書</div>
+      <div class="ver">設計資料 / 全7文書</div>
     </div>
     <nav><a href="01_concept.html"><span class="nav-no">01</span><span class="nav-t">コンセプト</span></a>
 <a href="02_function_design.html" class="active"><span class="nav-no">02</span><span class="nav-t">機能設計</span></a>
@@ -308,7 +308,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <hr>
 <h2 id="5-f03-記録-行った証明">5. F03 記録(行った証明)</h2>
 <h3 id="5-1-要件">5.1 要件</h3>
-<p>MVP の「行った証明」は<strong>自己申告</strong>。記録の完了をもって「行った」とする。</p>
+<p>「行った証明」は<strong>自己申告</strong>。記録の完了をもって「行った」とする。</p>
 <h3 id="5-2-状態遷移">5.2 状態遷移</h3>
 <p>予定日(または任意の日)ごとに、その日の状態は次のいずれか。</p>
 <pre><code>            ┌──────────┐
@@ -331,10 +331,10 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <blockquote>
 <p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。予定日が BLANK のまま日を終えた場合は <strong>未達</strong> として扱う(§6.1)。</p>
 </blockquote>
-<h3 id="5-3-記録の内容-mvp">5.3 記録の内容(MVP)</h3>
+<h3 id="5-3-記録の内容">5.3 記録の内容</h3>
 <ul>
 <li>必須: 実施日</li>
-<li>任意: メモ、種目/部位の簡易タグ、所要時間。<strong>MVP では軽量</strong>に保ち、習慣化の可視化を優先</li>
+<li>任意: メモ、種目/部位の簡易タグ、所要時間。<strong>記録は軽量</strong>に保ち、習慣化の可視化を優先</li>
 </ul>
 <h3 id="5-4-エンドポイント">5.4 エンドポイント</h3>
 <table>
@@ -544,7 +544,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </ul>
 <h3 id="7-2-プライバシー">7.2 プライバシー</h3>
 <ul>
-<li>共有するのは記録の有無・回数・連続など<strong>進捗系のみ</strong>。記録メモ等の詳細は共有しない(MVP)</li>
+<li>共有するのは記録の有無・回数・連続など<strong>進捗系のみ</strong>。記録メモ等の詳細は共有しない</li>
 </ul>
 <h3 id="7-3-エンドポイント">7.3 エンドポイント</h3>
 <table>
@@ -616,7 +616,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#5-f03-記録-行った証明" class="toc-l2">5. F03 記録(行った証明)</a>
 <a href="#5-1-要件" class="toc-l3">5.1 要件</a>
 <a href="#5-2-状態遷移" class="toc-l3">5.2 状態遷移</a>
-<a href="#5-3-記録の内容-mvp" class="toc-l3">5.3 記録の内容(MVP)</a>
+<a href="#5-3-記録の内容" class="toc-l3">5.3 記録の内容</a>
 <a href="#5-4-エンドポイント" class="toc-l3">5.4 エンドポイント</a>
 <a href="#6-f04-報酬・ペナルティ-積み重ねの増減" class="toc-l2">6. F04 報酬・ペナルティ(積み重ねの増減)</a>
 <a href="#6-1-連続カウント-ストリーク" class="toc-l3">6.1 連続カウント(ストリーク)</a>
