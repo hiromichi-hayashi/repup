@@ -1,19 +1,19 @@
 ---
 name: worktree-setup
-description: "Linear Issue ID を起点に git worktree を作成し、並列開発環境をセットアップするスキル。使用タイミング: (1) チケットを並列で作業したい時、(2) /worktree-setup または /worktree-setup DEV-123 と呼ばれた時、(3) 複数の Issue を同時進行したい時。worktree 作成後はそのディレクトリで spec-driven-dev を実行する前提。"
+description: "タスク(GitHub issue / 説明)を起点に git worktree を作成し、並列開発環境をセットアップするスキル。使用タイミング: (1) チケットを並列で作業したい時、(2) /worktree-setup または /worktree-setup DEV-123 と呼ばれた時、(3) 複数の Issue を同時進行したい時。worktree 作成後はそのディレクトリで spec-driven-dev を実行する前提。"
 ---
 
 # Worktree Setup
 
-Linear Issue ID から git worktree を作成し、独立した開発環境を構築するスキル。各 worktree でポートを分離し、Claude の設定を共有する。
+タスク(GitHub issue / 説明)から git worktree を作成し、独立した開発環境を構築するスキル。各 worktree でポートを分離し、Claude の設定を共有する。
 
 ## ワークフロー
 
 ### Step 1: Issue ID の取得
 
-1. 引数から Linear Issue ID を取得する（例: `DEV-9`）
+1. 引数からタスク識別子を取得する（GitHub issue 番号 / 短いスラッグ。例: `12` / `team-goal`）
 2. Issue ID がなければ AskUserQuestion で確認する
-3. Linear MCP ツール (`get_issue`) で Issue の内容を取得し、タイトルを確認する
+3. GitHub issue なら `gh issue view <n>` で内容・タイトルを確認する(説明文ならそのまま使う)
 
 ### Step 2: ブランチ名の決定
 
