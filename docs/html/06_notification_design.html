@@ -261,7 +261,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <hr>
 <h2 id="7-権限・失敗時">7. 権限・失敗時</h2>
 <ul>
-<li>通知許可はオンボーディング(SC-02)で取得。未許可なら設定(SC-09)から再取得導線</li>
+<li>通知許可は初回設定(SC-02)で取得。未許可なら設定(SC-09)から再取得導線</li>
 <li>Expo Push が <code>DeviceNotRegistered</code> を返したトークンは無効化(<code>PushToken</code> を削除/失効)</li>
 <li>配信失敗はログのみ。ユーザー操作はブロックしない</li>
 </ul>

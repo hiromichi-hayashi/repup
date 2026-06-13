@@ -124,9 +124,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 <tr>
 <td>SC-02</td>
-<td>オンボーディング</td>
+<td>初回設定</td>
 <td>BASE-02</td>
-<td>目的・通う日(繰り返し)・時間帯・通知許可</td>
+<td>設定の目標設定フォームを流用 + 通知許可(初回のみ)</td>
 </tr>
 <tr>
 <td>SC-03</td>
@@ -180,7 +180,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 [Tab] 成長(SC-06)
         設定(SC-09) は各所からアクセス
 
-初回のみ: サインイン(SC-03) → オンボーディング(SC-02) → ホーム
+初回のみ: サインイン(SC-03) → 初回設定(SC-02) → ホーム
 </code></pre>
 <hr>
 <h2 id="3-画面詳細">3. 画面詳細</h2>
@@ -193,12 +193,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>主要 CTA: <strong>記録する</strong>(→ SC-05)</li>
 <li>過去のブランク日があれば「確定する」導線(→ SC-05)</li>
 </ul>
-<h3 id="sc-02-オンボーディング-初回設定の-ui-フロー">SC-02 オンボーディング(初回設定の UI フロー)</h3>
-<p><strong>目的</strong>: 動機づけの初期設定。初回に目標設定を一度通すだけの画面で、独立した API は持たない(<a href="02_function_design.html">02</a> §3.3)。</p>
+<h3 id="sc-02-初回設定-設定の目標設定を流用">SC-02 初回設定(設定の目標設定を流用)</h3>
+<p><strong>目的</strong>: 初回の目標設定。<strong>専用 UI は作らず、設定(SC-09)の「目標設定」フォームをそのまま初回に通す</strong>(<a href="02_function_design.html">02</a> §3.3)。</p>
 <ul>
-<li>目的の入力/選択 → <strong>通う日(繰り返しスケジュール)の設定</strong>(毎週の曜日 / N週ごと / 毎月の日) → 既定時間帯(<strong>朝を推奨表示</strong>)→ 通知許可</li>
+<li>内容は設定の目標設定と同じ: 目的 → <strong>通う日(繰り返しスケジュール)</strong>(毎週の曜日 / N週ごと / 毎月の日) → 既定時間帯(<strong>朝を推奨表示</strong>)</li>
+<li>初回のみ <strong>通知許可</strong> を要求</li>
 <li>完了でアカウント設定を保存(<code>PATCH /account</code>、<code>onboardedAt</code> 記録)、通う日を作成(<code>POST /schedules</code>)し、ホームへ</li>
-<li>通う日は連続カウント(F04)の基準になる(SC-04 で後から編集可)</li>
+<li>通う日は連続カウント(F04)の基準。以後の編集は設定(SC-09)で行う</li>
 </ul>
 <h3 id="sc-03-サインイン">SC-03 サインイン</h3>
 <ul>
@@ -293,7 +294,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#2-ナビゲーション構造" class="toc-l2">2. ナビゲーション構造</a>
 <a href="#3-画面詳細" class="toc-l2">3. 画面詳細</a>
 <a href="#sc-01-ホーム" class="toc-l3">SC-01 ホーム</a>
-<a href="#sc-02-オンボーディング-初回設定の-ui-フロー" class="toc-l3">SC-02 オンボーディング(初回設定の UI フロー)</a>
+<a href="#sc-02-初回設定-設定の目標設定を流用" class="toc-l3">SC-02 初回設定(設定の目標設定を流用)</a>
 <a href="#sc-03-サインイン" class="toc-l3">SC-03 サインイン</a>
 <a href="#sc-04-スケジュール一覧-編集" class="toc-l3">SC-04 スケジュール一覧 / 編集</a>
 <a href="#sc-05-記録入力-モーダル" class="toc-l3">SC-05 記録入力(モーダル)</a>

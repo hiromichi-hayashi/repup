@@ -219,8 +219,8 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <p><strong>頻度は「週 N 回」の数値で持たない</strong>(<code>weeklyTarget</code> は廃止)。通う日をスケジュールで具体的に定義し、頻度の二重管理を避ける。目的(<code>purpose</code>)と通う日(スケジュール)は別概念。</p>
 </blockquote>
 <p>アカウント情報(<code>purpose</code> / <code>defaultTimeOfDay</code> 等)は <strong><code>/account</code></strong> で、通う日は <strong><code>/schedules</code></strong>(§4.3)で扱う。</p>
-<h3 id="3-3-「オンボーディング」の位置づけ">3.3 「オンボーディング」の位置づけ</h3>
-<p>「オンボーディング」は <strong>独立した API ではなく、初回起動時に上記設定を一度通す UI フロー</strong>(画面 SC-02)の呼び名にすぎない。完了は<strong>初回の保存(<code>PATCH /account</code>)時にサーバーが <code>onboardedAt</code> を記録</strong>して表現する(専用の完了エンドポイントは持たない)。</p>
+<h3 id="3-3-初回設定-オンボーディング-の位置づけ">3.3 初回設定(オンボーディング)の位置づけ</h3>
+<p>初回設定は <strong>専用 UI を作らず、設定の目標設定フォーム(画面 SC-02 = SC-09 の流用)を初回に通すだけ</strong>。独立した API も持たず、完了は<strong>初回の保存(<code>PATCH /account</code>)時にサーバーが <code>onboardedAt</code> を記録</strong>して表現する(専用の完了エンドポイントは持たない)。</p>
 <h3 id="3-4-エンドポイント">3.4 エンドポイント</h3>
 <table>
 <thead>
@@ -262,7 +262,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>当日リマインド + 前日リマインド(明日が予定日のリマインド)</li>
 </ul>
 <blockquote>
-<p>初回の通う日はオンボーディング(SC-02)で設定する。連続判定がこれに依存するため、繰り返しスケジュールは早期(P1)に用意する(<a href="07_implementation_roadmap.html">07</a>)。</p>
+<p>初回の通う日は初回設定(SC-02)で設定する。連続判定がこれに依存するため、繰り返しスケジュールは早期(P1)に用意する(<a href="07_implementation_roadmap.html">07</a>)。</p>
 </blockquote>
 <h3 id="4-2-データと予定日-オカレンス">4.2 データと予定日(オカレンス)</h3>
 <p><code>Schedule</code>(詳細は <a href="03_database_design.html">03 DB設計</a> §Schedule)。繰り返しは <code>recurrenceRule</code>(JSON)+ <code>startDate</code>(N週ごとの基準週)で表現する。</p>
@@ -606,7 +606,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#3-base-02-アカウント-目標設定" class="toc-l2">3. BASE-02 アカウント / 目標設定</a>
 <a href="#3-1-アカウント情報" class="toc-l3">3.1 アカウント情報</a>
 <a href="#3-2-目標設定-個人" class="toc-l3">3.2 目標設定(個人)</a>
-<a href="#3-3-「オンボーディング」の位置づけ" class="toc-l3">3.3 「オンボーディング」の位置づけ</a>
+<a href="#3-3-初回設定-オンボーディング-の位置づけ" class="toc-l3">3.3 初回設定(オンボーディング)の位置づけ</a>
 <a href="#3-4-エンドポイント" class="toc-l3">3.4 エンドポイント</a>
 <a href="#4-f01-スケジュール-リマインド" class="toc-l2">4. F01 スケジュール  リマインド</a>
 <a href="#4-1-要件" class="toc-l3">4.1 要件</a>
