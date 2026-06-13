@@ -1,6 +1,6 @@
 ---
 name: worktree-setup
-description: "タスク(GitHub issue / 説明)を起点に git worktree を作成し、並列開発環境をセットアップするスキル。使用タイミング: (1) チケットを並列で作業したい時、(2) /worktree-setup または /worktree-setup DEV-123 と呼ばれた時、(3) 複数の Issue を同時進行したい時。worktree 作成後はそのディレクトリで spec-driven-dev を実行する前提。"
+description: "タスク(GitHub issue / 説明)を起点に git worktree を作成し、並列開発環境をセットアップするスキル。使用タイミング: (1) タスクを並列で作業したい時、(2) /worktree-setup または /worktree-setup <task> と呼ばれた時、(3) 複数のタスクを同時進行したい時。worktree 作成後はそのディレクトリで spec-driven-dev を実行する前提。"
 ---
 
 # Worktree Setup

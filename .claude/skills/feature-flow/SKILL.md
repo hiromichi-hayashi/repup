@@ -1,6 +1,6 @@
 ---
 name: feature-flow
-description: worktree 内で 1 タスク(GitHub issue / 説明)を end-to-end 実装するオーケストレーター。spec-driven-dev で設計書グラウンディング付きの実装を回し、各ステップで step-complete を gate として通す (Must-fix = 規約違反・型安全性違反・明らかな不具合・設計書逸脱 はその場で修正→再レビュー、Defer = 主観的 style は記録)。最終に requesting-code-review、残った Must-fix をまとめて修正、ユーザー確認のうえ PR を作成する。worktree-setup で作った worktree 内・対象ブランチ上で実行する前提。使用タイミング (1) /feature-flow TEG-123 と呼ばれた時、(2) worktree に入って 1 チケットを実装〜PR まで通したい時。
+description: worktree 内で 1 タスク(GitHub issue / 説明)を end-to-end 実装するオーケストレーター。spec-driven-dev で設計書グラウンディング付きの実装を回し、各ステップで step-complete を gate として通す (Must-fix = 規約違反・型安全性違反・明らかな不具合・設計書逸脱 はその場で修正→再レビュー、Defer = 主観的 style は記録)。最終に requesting-code-review、残った Must-fix をまとめて修正、ユーザー確認のうえ PR を作成する。worktree-setup で作った worktree 内・対象ブランチ上で実行する前提。使用タイミング (1) /feature-flow <task> と呼ばれた時、(2) worktree に入って 1 タスクを実装〜PR まで通したい時。
 ---
 
 # feature-flow: 1 issue を実装〜PR まで
