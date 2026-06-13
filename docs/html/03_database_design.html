@@ -501,6 +501,24 @@ User 1──n NotificationLog
 <td>チーム名</td>
 </tr>
 <tr>
+<td>slogan</td>
+<td>text</td>
+<td>null可</td>
+<td>チームの目的/スローガン(例「朝ジム部」)</td>
+</tr>
+<tr>
+<td>recommendedRule</td>
+<td>jsonb</td>
+<td>null可</td>
+<td>推奨の通う日(<code>Schedule.recurrenceRule</code> と同形式)</td>
+</tr>
+<tr>
+<td>recommendedStartDate</td>
+<td>date</td>
+<td>null可</td>
+<td>推奨通う日の基準週(interval≥2 用)</td>
+</tr>
+<tr>
 <td>ownerId</td>
 <td>text</td>
 <td>FK→User</td>
@@ -519,6 +537,9 @@ User 1──n NotificationLog
 <td></td>
 </tr>
 </tbody></table>
+<blockquote>
+<p>チーム目標は <strong>①スローガン(テキスト)</strong> と <strong>②推奨の通う日</strong>(<code>recommendedRule</code>)の 2 つ。推奨の通う日はメンバーが自分の <code>Schedule</code> に<strong>取り込む</strong>ためのテンプレートであり、連続カウントは取り込んだ後も各自の <code>Schedule</code>(§3.3)を基準にする(<a href="02_function_design.html">02</a> §7.2)。</p>
+</blockquote>
 <h3 id="3-8-membership-f06">3.8 Membership(F06)</h3>
 <p>User と Team の中間。進捗共有の単位。</p>
 <table>

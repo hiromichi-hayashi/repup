@@ -530,23 +530,34 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tbody></table>
 <blockquote>
 <p>自分のランクは自分の <code>userId</code>(<code>/account</code> で取得済み)で引く。専用の <code>/rank/me</code> は持たない。
-ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§7.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
+ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§7.4 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
 </blockquote>
 <hr>
 <h2 id="7-f06-チーム">7. F06 チーム</h2>
 <h3 id="7-1-要件">7.1 要件</h3>
-<p>一人にしない。チームで進捗を共有し、<strong>チーム内ランキング</strong>で励む。</p>
+<p>一人にしない。チームで進捗を共有し、<strong>チーム内ランキング</strong>で励まし、<strong>チーム目標</strong>で方向を揃える。</p>
 <ul>
 <li>チーム作成(作成者がオーナー)、招待コード or リンクで参加</li>
 <li>メンバーの<strong>進捗が見える</strong>(直近の記録状況・連続カウント)</li>
 <li><strong>チーム内ランキング</strong>(指標は連続カウント / 期間内記録数 / ランク のいずれか。既定は §8 で確定)。メンバーのユーザー紐づきランク(§6.5)を集約して構成</li>
 <li>ランキングは<strong>チーム内のみ</strong>(対象外は <a href="01_concept.html">01</a> §7.3)</li>
+<li><strong>チーム目標</strong>(スローガン・共通の通う日)を持てる(§7.2)</li>
 </ul>
-<h3 id="7-2-プライバシー">7.2 プライバシー</h3>
+<h3 id="7-2-チーム目標-スローガン・共通の通う日">7.2 チーム目標(スローガン・共通の通う日)</h3>
+<p>チームはオーナーが 2 種類の目標を設定できる。</p>
+<ul>
+<li><strong>スローガン / 目的</strong>(<code>Team.slogan</code>, 任意): 例「朝ジム部」。チームの方向性を表すテキスト</li>
+<li><strong>共通の通う日(推奨)</strong>(<code>Team.recommendedRule</code>): チームが推奨する繰り返しスケジュール(<code>Schedule.recurrenceRule</code> と同形式)</li>
+</ul>
+<p><strong>取り込み(adopt)</strong>: メンバーは推奨の通う日を<strong>自分の <code>Schedule</code> に取り込める</strong>(参加時に提案、以後も任意で実行)。取り込んだ後は自分の予定として編集できる。</p>
+<blockquote>
+<p><strong>不変条件</strong>: 連続カウント(§6.1)・リマインドは<strong>各自の <code>Schedule</code>(個人の通う日)を基準</strong>にする。チームの推奨は「取り込み元のテンプレート」であって個人スケジュールを置き換えない。共通の通う日にすると、メンバー間で予定日が揃いランキングを比較しやすくなる。</p>
+</blockquote>
+<h3 id="7-3-プライバシー">7.3 プライバシー</h3>
 <ul>
 <li>共有するのは記録の有無・回数・連続など<strong>進捗系のみ</strong>。記録メモ等の詳細は共有しない</li>
 </ul>
-<h3 id="7-3-エンドポイント">7.3 エンドポイント</h3>
+<h3 id="7-4-エンドポイント">7.4 エンドポイント</h3>
 <table>
 <thead>
 <tr>
@@ -563,12 +574,22 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>GET</td>
 <td><code>/teams/:id</code></td>
-<td>チーム情報・メンバー進捗</td>
+<td>チーム情報(スローガン・推奨通う日)・メンバー進捗</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td><code>/teams/:id</code></td>
+<td>チーム情報・<strong>チーム目標</strong>(名前・スローガン・推奨通う日)の更新(オーナーのみ)</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/teams/:id/join</code></td>
 <td>招待コードで参加</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/teams/:id/adopt-schedule</code></td>
+<td>チームの推奨通う日を自分の <code>Schedule</code> に取り込む</td>
 </tr>
 <tr>
 <td>DELETE</td>
@@ -626,8 +647,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#6-5-エンドポイント" class="toc-l3">6.5 エンドポイント</a>
 <a href="#7-f06-チーム" class="toc-l2">7. F06 チーム</a>
 <a href="#7-1-要件" class="toc-l3">7.1 要件</a>
-<a href="#7-2-プライバシー" class="toc-l3">7.2 プライバシー</a>
-<a href="#7-3-エンドポイント" class="toc-l3">7.3 エンドポイント</a>
+<a href="#7-2-チーム目標-スローガン・共通の通う日" class="toc-l3">7.2 チーム目標(スローガン・共通の通う日)</a>
+<a href="#7-3-プライバシー" class="toc-l3">7.3 プライバシー</a>
+<a href="#7-4-エンドポイント" class="toc-l3">7.4 エンドポイント</a>
 <a href="#8-未確定事項" class="toc-l2">8. 未確定事項</a>
       </aside>
     </div>

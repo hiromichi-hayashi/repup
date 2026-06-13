@@ -146,9 +146,14 @@ Expo Push トークン(端末ごと)。
 |---|---|---|---|
 | id | text | PK | |
 | name | text | | チーム名 |
+| slogan | text | null可 | チームの目的/スローガン(例「朝ジム部」) |
+| recommendedRule | jsonb | null可 | 推奨の通う日(`Schedule.recurrenceRule` と同形式) |
+| recommendedStartDate | date | null可 | 推奨通う日の基準週(interval≥2 用) |
 | ownerId | text | FK→User | オーナー |
 | inviteCode | text | unique | 招待コード |
 | createdAt | timestamptz | default now | |
+
+> チーム目標は **①スローガン(テキスト)** と **②推奨の通う日**(`recommendedRule`)の 2 つ。推奨の通う日はメンバーが自分の `Schedule` に**取り込む**ためのテンプレートであり、連続カウントは取り込んだ後も各自の `Schedule`(§3.3)を基準にする([02](02_function_design.html) §7.2)。
 
 ### 3.8 Membership(F06)
 
