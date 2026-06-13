@@ -130,24 +130,18 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 <tr>
 <td>N-03</td>
-<td>チェックリスト未達アラート</td>
-<td>前日時点で未チェック項目あり</td>
-<td>F02</td>
-</tr>
-<tr>
-<td>N-04</td>
 <td>連続途切れ警告(任意)</td>
 <td>連続が途切れそう/途切れた</td>
-<td>F04 §7.4</td>
+<td>F04 §6.4</td>
 </tr>
 </tbody></table>
 <blockquote>
-<p>N-04 は MVP では任意。最小は N-01〜N-03。</p>
+<p>N-03 は MVP では任意。最小は N-01・N-02(リマインド)。</p>
 </blockquote>
 <hr>
 <h2 id="2-配信アーキテクチャ">2. 配信アーキテクチャ</h2>
 <pre><code>[cron] 定期実行(例: 5〜15分間隔)
-   │  対象抽出: Schedule + Checklist + User設定 + PushToken
+   │  対象抽出: Schedule(予定日)+ User設定 + PushToken
    ▼
 [配信判定] 送る/送らない・冪等性チェック(NotificationLog)
    │
@@ -181,11 +175,6 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>前日の夜(例 20:00)</td>
 <td>ON/OFF 可</td>
 </tr>
-<tr>
-<td>N-03 チェックリスト</td>
-<td>前日の夜(N-02 と同時 or 直後)</td>
-<td>ON/OFF 可</td>
-</tr>
 </tbody></table>
 <blockquote>
 <p>既定時刻の具体値は実装時に確定し本表を更新する。時刻は <strong>JST 表示 / UTC 保存</strong>。</p>
@@ -196,7 +185,6 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ol>
 <li><strong>当日リマインド(N-01)</strong>: 今日が**予定日(オカレンス)**である <code>active=true</code> の予定(<code>recurrenceRule</code> を展開して判定: single / weekly+interval / monthly。展開仕様は <a href="02_function_design.html">02</a> §4.2)。配信予定時刻に達したもの</li>
 <li><strong>前日リマインド(N-02)</strong>: 明日が予定日の予定。前日配信時刻に達したもの</li>
-<li><strong>チェックリスト未達(N-03)</strong>: N-02 対象のうち、紐づく <code>Checklist</code> に <code>checked=false</code> の項目が残るもの</li>
 <li>各対象ユーザーの有効な <code>PushToken</code> を解決</li>
 </ol>
 <hr>
@@ -239,7 +227,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td>type</td>
 <td>enum</td>
 <td></td>
-<td>N01/N02/N03/N04</td>
+<td>N01/N02/N03</td>
 </tr>
 <tr>
 <td>targetDate</td>
@@ -268,13 +256,12 @@ body{margin:0;background:var(--paper);color:var(--ink);
 }
 </code></pre>
 <ul>
-<li><code>data.type</code> と <code>scheduleId</code> で、タップ時にホーム(SC-01)や記録(SC-07)へディープリンク</li>
-<li>N-03 は本文に未達項目数を含める(例: 「準備が2つ残っています」)</li>
+<li><code>data.type</code> と <code>scheduleId</code> で、タップ時にホーム(SC-01)や記録(SC-05)へディープリンク</li>
 </ul>
 <hr>
 <h2 id="7-権限・失敗時">7. 権限・失敗時</h2>
 <ul>
-<li>通知許可はオンボーディング(SC-02)で取得。未許可なら設定(SC-11)から再取得導線</li>
+<li>通知許可はオンボーディング(SC-02)で取得。未許可なら設定(SC-09)から再取得導線</li>
 <li>Expo Push が <code>DeviceNotRegistered</code> を返したトークンは無効化(<code>PushToken</code> を削除/失効)</li>
 <li>配信失敗はログのみ。ユーザー操作はブロックしない</li>
 </ul>
@@ -283,7 +270,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li>各通知の既定時刻の具体値(§3)</li>
 <li>cron 実行間隔(§2)</li>
-<li>N-04(連続途切れ警告)を MVP に含めるか(§1)</li>
+<li>N-03(連続途切れ警告)を MVP に含めるか(§1)</li>
 </ul>
 
         <nav class="pager"><a href="05_tech_stack.html"><div class="dir">← PREV</div><div class="t">05 技術スタック</div></a><a href="07_implementation_roadmap.html" class="next"><div class="dir">NEXT →</div><div class="t">07 ロードマップ</div></a></nav>

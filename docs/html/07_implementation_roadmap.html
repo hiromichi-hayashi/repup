@@ -139,7 +139,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 <tr>
 <td><strong>全テーブル作成</strong></td>
-<td>Neon + Prisma(driver adapter)で <a href="03_database_design.html">03</a> の<strong>全テーブルを一括マイグレーション</strong>(User / PushToken / Schedule / ChecklistTemplateItem / Checklist / ChecklistItem / Record / UserStats / Trophy / Team / Membership / NotificationLog + Better Auth テーブル)</td>
+<td>Neon + Prisma(driver adapter)で <a href="03_database_design.html">03</a> の<strong>全テーブルを一括マイグレーション</strong>(User / PushToken / Schedule / Record / UserStats / Trophy / Team / Membership / NotificationLog + Better Auth テーブル)</td>
 <td>03</td>
 </tr>
 <tr>
@@ -202,7 +202,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>記録入力</td>
 <td>記録する / 行かなかった</td>
-<td>SC-07</td>
+<td>SC-05</td>
 </tr>
 </tbody></table>
 <blockquote>
@@ -218,18 +218,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </thead>
 <tbody><tr>
-<td>チェックリスト</td>
-<td>テンプレート + 予定実体</td>
-<td>F02 / SC-05,06</td>
-</tr>
-<tr>
 <td>通知基盤</td>
-<td>cron + Expo Push、N-01〜N-03、冪等性。<strong>P1 の予定日(オカレンス)を基準に配信</strong></td>
+<td>cron + Expo Push、N-01・N-02(リマインド)、冪等性。<strong>P1 の予定日(オカレンス)を基準に配信</strong></td>
 <td>06</td>
 </tr>
 </tbody></table>
 <blockquote>
-<p>通う日(スケジュール)自体は P1 で構築済み。P3 はその予定日に対するリマインド配信とチェックリストを載せる。</p>
+<p>通う日(スケジュール)自体は P1 で構築済み。P3 はその予定日に対するリマインド配信を載せる。</p>
 </blockquote>
 <h3 id="p4-報酬・ペナルティ-続ける動機-api-フロント">P4 — 報酬・ペナルティ(続ける動機 / API + フロント)</h3>
 <table>
@@ -243,17 +238,17 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td>連続カウント確定ロジック</td>
 <td>予定日(P1) × 記録(P2)で判定。日次 cron で未達反映</td>
-<td>F04 §7.1</td>
+<td>F04 §6.1</td>
 </tr>
 <tr>
 <td>トロフィー(シーズン制ランク)</td>
 <td>6段階・<strong>昇格のみ</strong>・<code>seasonBestStreak</code> から導出。<strong>年次リセット cron</strong></td>
-<td>F04 §7.2</td>
+<td>F04 §6.2</td>
 </tr>
 <tr>
 <td>成長画面</td>
 <td>グラフ・現在ランク・次ランクまで・シーズン残り</td>
-<td>SC-08</td>
+<td>SC-06</td>
 </tr>
 </tbody></table>
 <h3 id="p5-チーム-api-フロント">P5 — チーム(API + フロント)</h3>
@@ -268,7 +263,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tbody><tr>
 <td>チーム CRUD</td>
 <td>作成/参加(招待コード)</td>
-<td>F06 / SC-09</td>
+<td>F06 / SC-07</td>
 </tr>
 <tr>
 <td>進捗共有</td>
@@ -278,7 +273,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <tr>
 <td>チーム内ランキング</td>
 <td>指標・期間</td>
-<td>F06 / SC-10</td>
+<td>F06 / SC-08</td>
 </tr>
 </tbody></table>
 <h3 id="p6-仕上げ">P6 — 仕上げ</h3>
@@ -291,7 +286,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </thead>
 <tbody><tr>
 <td>設定画面</td>
-<td>通知時刻・ON/OFF・サインアウト(SC-11)</td>
+<td>通知時刻・ON/OFF・サインアウト(SC-09)</td>
 </tr>
 <tr>
 <td>空/異常表示</td>
@@ -312,14 +307,14 @@ body{margin:0;background:var(--paper);color:var(--ink);
    └─ P1 アカウント/目標設定 + 通う日(F01 繰り返しスケジュール → 予定日生成)
          ├─ P2 F03 記録 ─────────┐
          │                       └─ P4 F04 報酬・ペナルティ(予定日 × 記録で連続判定)
-         ├─ P3 06 通知 ── F02 チェックリスト   ※リマインドは P1 の予定日が基準
+         ├─ P3 06 通知   ※リマインドは P1 の予定日が基準
          └─ P5 F06 チーム(F03 の記録に依存)
 </code></pre>
 <ul>
 <li><strong>テーブルは BASE で全量作成済み</strong>。各機能フェーズは新規マイグレーションを基本伴わず、API+フロントの実装に集中する</li>
 <li><strong>連続カウント(F04)は「予定日(P1 スケジュール)× 記録(P2)」に依存</strong>。通う日は P1 で先に用意する</li>
 <li><strong>F03(記録)が中心依存</strong>。報酬・チーム・ランキングは記録データに依存する</li>
-<li>通知(06)は P1 の予定日 + F02 の後</li>
+<li>通知(06)は P1 の予定日の後</li>
 </ul>
 <hr>
 <h2 id="4-段階移行-mvp-2nd">4. 段階移行(MVP → 2nd)</h2>
@@ -354,7 +349,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h2 id="5-開発規律">5. 開発規律</h2>
 <ul>
 <li>設計書を SSoT とし、<strong>実装が設計と食い違ったらコードを直す前に設計書を直す</strong></li>
-<li>未確定事項(<a href="02_function_design.html">02</a> §9 / <a href="05_tech_stack.html">05</a> §3 / <a href="06_notification_design.html">06</a> §8)は、着手前に確定して該当節を更新する</li>
+<li>未確定事項(<a href="02_function_design.html">02</a> §8 / <a href="05_tech_stack.html">05</a> §3 / <a href="06_notification_design.html">06</a> §8)は、着手前に確定して該当節を更新する</li>
 <li><code>main</code> に直 push しない / git hook を skip しない</li>
 </ul>
 

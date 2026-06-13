@@ -152,11 +152,6 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <td><code>/schedules</code></td>
 </tr>
 <tr>
-<td>F02</td>
-<td>準備チェックリスト</td>
-<td><code>/checklist-templates</code>, <code>/checklists</code></td>
-</tr>
-<tr>
 <td>F03</td>
 <td>記録</td>
 <td><code>/records</code></td>
@@ -207,7 +202,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tbody></table>
 <hr>
 <h2 id="3-base-02-アカウント-目標設定">3. BASE-02 アカウント / 目標設定</h2>
-<p>実体は <strong>アカウント情報</strong> と <strong>個人の目標設定</strong> の2つ。いずれも<strong>個人単位</strong>で、チームは関与しない(チームは F06)。設定値は設定画面(SC-11)からいつでも編集できる。</p>
+<p>実体は <strong>アカウント情報</strong> と <strong>個人の目標設定</strong> の2つ。いずれも<strong>個人単位</strong>で、チームは関与しない(チームは F06)。設定値は設定画面(SC-09)からいつでも編集できる。</p>
 <h3 id="3-1-アカウント情報">3.1 アカウント情報</h3>
 <ul>
 <li><strong>表示名</strong></li>
@@ -217,7 +212,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h3 id="3-2-目標設定-個人">3.2 目標設定(個人)</h3>
 <ul>
 <li><strong>目的 / 動機</strong>(任意, <code>purpose</code>): 「なぜ行くか」の自由記述。例「継続したい」</li>
-<li><strong>通う日</strong>: いつ通うか。<strong>F01 スケジュール(繰り返し)に一本化</strong>する(§4)。「どれだけ・いつ行くか」はこの通う日が表し、連続カウント(§7.1)の基準にもなる</li>
+<li><strong>通う日</strong>: いつ通うか。<strong>F01 スケジュール(繰り返し)に一本化</strong>する(§4)。「どれだけ・いつ行くか」はこの通う日が表し、連続カウント(§6.1)の基準にもなる</li>
 <li><strong>既定の時間帯</strong>(<code>defaultTimeOfDay</code>): 朝 / 昼 / 夜。新規スケジュールの初期値(朝を既定として提案。強制しない。<a href="01_concept.html">01</a> §4.5)</li>
 </ul>
 <blockquote>
@@ -254,7 +249,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <hr>
 <h2 id="4-f01-スケジュール-リマインド">4. F01 スケジュール &amp; リマインド</h2>
 <h3 id="4-1-要件">4.1 要件</h3>
-<p>「<strong>通う日</strong>」を事前に決め、当日(と前日)にプッシュで背中を押す。<strong>「いかなきゃ」を作る中核</strong>であり、同時に<strong>連続カウント(§7.1)の判定基準</strong>でもある(通う日 = スケジュールに一本化)。</p>
+<p>「<strong>通う日</strong>」を事前に決め、当日(と前日)にプッシュで背中を押す。<strong>「いかなきゃ」を作る中核</strong>であり、同時に<strong>連続カウント(§6.1)の判定基準</strong>でもある(通う日 = スケジュールに一本化)。</p>
 <ul>
 <li>繰り返しパターンに対応:<ul>
 <li><strong>毎週</strong>: 指定曜日(例 月・水・金)</li>
@@ -264,7 +259,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </ul>
 </li>
 <li>予定ごとに時間帯(開始予定時刻)を持つ。朝を既定として提案(<a href="01_concept.html">01</a> §4.5)</li>
-<li>当日リマインド + 前日リマインド(チェックリスト未達アラートと連動、§F02)</li>
+<li>当日リマインド + 前日リマインド(明日が予定日のリマインド)</li>
 </ul>
 <blockquote>
 <p>初回の通う日はオンボーディング(SC-02)で設定する。連続判定がこれに依存するため、繰り返しスケジュールは早期(P1)に用意する(<a href="07_implementation_roadmap.html">07</a>)。</p>
@@ -277,7 +272,7 @@ body{margin:0;background:var(--paper);color:var(--ink);
 2週に1回: { &quot;type&quot;: &quot;weekly&quot;,  &quot;interval&quot;: 2, &quot;weekdays&quot;: [1] }
 毎月:     { &quot;type&quot;: &quot;monthly&quot;, &quot;days&quot;: [1,15] }
 </code></pre>
-<p>スケジュールは指定期間に対して<strong>予定日(オカレンス)の集合</strong>を生成する。リマインド配信(§4.4)も連続判定(§7.1)も、この予定日を基準にする。複数スケジュールがある場合、同一日付の予定日はまとめて 1 つの「通う日」として扱う。</p>
+<p>スケジュールは指定期間に対して<strong>予定日(オカレンス)の集合</strong>を生成する。リマインド配信(§4.4)も連続判定(§6.1)も、この予定日を基準にする。複数スケジュールがある場合、同一日付の予定日はまとめて 1 つの「通う日」として扱う。</p>
 <h3 id="4-3-エンドポイント">4.3 エンドポイント</h3>
 <table>
 <thead>
@@ -311,55 +306,10 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <h3 id="4-4-リマインド配信">4.4 リマインド配信</h3>
 <p>cron が定期実行し、対象予定を抽出して Expo Push を送る。配信タイミング・ペイロード・冪等性は <a href="06_notification_design.html">06 通知設計</a> に定義。</p>
 <hr>
-<h2 id="5-f02-準備チェックリスト">5. F02 準備チェックリスト</h2>
+<h2 id="5-f03-記録-行った証明">5. F03 記録(行った証明)</h2>
 <h3 id="5-1-要件">5.1 要件</h3>
-<p>行く前の段取りをアプリが持つ。「準備がだるい / 忘れる」への対策。</p>
-<ul>
-<li>ユーザーは<strong>チェック項目テンプレート</strong>を自由に編集(例: タオル、シューズ、<strong>コワーキングスペース予約済み?</strong>)</li>
-<li>予定(Schedule)に紐づくチェックリストを生成し、各項目を ON/OFF</li>
-<li><strong>前日</strong>時点で未達(未チェック項目あり)なら<strong>アラート</strong>を出す(§06)</li>
-</ul>
-<h3 id="5-2-データモデルの考え方">5.2 データモデルの考え方</h3>
-<ul>
-<li><code>ChecklistTemplateItem</code>: ユーザーごとの「項目の定義」(再利用される)</li>
-<li><code>Checklist</code> + <code>ChecklistItem</code>: 特定の予定に対する実体(チェック状態を持つ)</li>
-</ul>
-<p>予定を作ると、テンプレートから当該予定用のチェックリストが複製される。テンプレートを後で変えても過去の予定の実体は変わらない。</p>
-<h3 id="5-3-エンドポイント">5.3 エンドポイント</h3>
-<table>
-<thead>
-<tr>
-<th>メソッド</th>
-<th>パス</th>
-<th>説明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>GET</td>
-<td><code>/checklist-templates</code></td>
-<td>テンプレート項目一覧</td>
-</tr>
-<tr>
-<td>PUT</td>
-<td><code>/checklist-templates</code></td>
-<td>テンプレート項目の一括更新</td>
-</tr>
-<tr>
-<td>GET</td>
-<td><code>/schedules/:id/checklist</code></td>
-<td>予定のチェックリスト取得</td>
-</tr>
-<tr>
-<td>PATCH</td>
-<td><code>/checklists/:id/items/:itemId</code></td>
-<td>項目のチェック状態更新</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="6-f03-記録-行った証明">6. F03 記録(行った証明)</h2>
-<h3 id="6-1-要件">6.1 要件</h3>
 <p>MVP の「行った証明」は<strong>自己申告</strong>。記録の完了をもって「行った」とする。</p>
-<h3 id="6-2-状態遷移">6.2 状態遷移</h3>
+<h3 id="5-2-状態遷移">5.2 状態遷移</h3>
 <p>予定日(または任意の日)ごとに、その日の状態は次のいずれか。</p>
 <pre><code>            ┌──────────┐
             │  BLANK   │  予定日が来た / 任意日。まだ何も確定していない
@@ -376,17 +326,17 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <ul>
 <li><strong>BLANK</strong>: 確定前。予定があったが未操作の状態。後から RECORDED / SKIPPED のどちらかに確定できる</li>
 <li><strong>RECORDED</strong>: 記録(内容入力)を完了 → <strong>「行った」</strong>。連続カウント・トロフィーに加算(§F04)</li>
-<li><strong>SKIPPED</strong>: 「行かなかった」を選択 → サボり。予定日なら連続カウントを途切れさせる(§7.1 / §7.4)</li>
+<li><strong>SKIPPED</strong>: 「行かなかった」を選択 → サボり。予定日なら連続カウントを途切れさせる(§6.1 / §6.4)</li>
 </ul>
 <blockquote>
-<p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。予定日が BLANK のまま日を終えた場合は <strong>未達</strong> として扱う(§7.1)。</p>
+<p>BLANK のまま放置された過去日は「未確定」。連続カウントの判定では、確定するまで連続を伸ばさない(RECORDED で初めて加算)。予定日が BLANK のまま日を終えた場合は <strong>未達</strong> として扱う(§6.1)。</p>
 </blockquote>
-<h3 id="6-3-記録の内容-mvp">6.3 記録の内容(MVP)</h3>
+<h3 id="5-3-記録の内容-mvp">5.3 記録の内容(MVP)</h3>
 <ul>
 <li>必須: 実施日</li>
 <li>任意: メモ、種目/部位の簡易タグ、所要時間。<strong>MVP では軽量</strong>に保ち、習慣化の可視化を優先</li>
 </ul>
-<h3 id="6-4-エンドポイント">6.4 エンドポイント</h3>
+<h3 id="5-4-エンドポイント">5.4 エンドポイント</h3>
 <table>
 <thead>
 <tr>
@@ -422,9 +372,9 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </tbody></table>
 <hr>
-<h2 id="7-f04-報酬・ペナルティ-積み重ねの増減">7. F04 報酬・ペナルティ(積み重ねの増減)</h2>
+<h2 id="6-f04-報酬・ペナルティ-積み重ねの増減">6. F04 報酬・ペナルティ(積み重ねの増減)</h2>
 <p>記録(F03)に応じて積み重ねが<strong>増える(報酬)/減る(ペナルティ)</strong>。両者は同じ「積み重ね」システムの増減方向であり、<strong>ペナルティは独立機能(旧 F05)としては持たず本機能に内包する</strong>。</p>
-<h3 id="7-1-連続カウント-ストリーク">7.1 連続カウント(ストリーク)</h3>
+<h3 id="6-1-連続カウント-ストリーク">6.1 連続カウント(ストリーク)</h3>
 <p><strong>予定日(スケジュールのオカレンス, §4.2)を守れている連続回数</strong>。決めた通う日を皆勤で通えている限り伸び、<strong>経過した予定日を 1 つでも落とすと 0 に戻る</strong>(=皆勤の連続)。毎日前提ではなく、各自が決めた通う日が基準。</p>
 <h4>予定日の達成判定</h4>
 <p>評価日を <code>today</code> とする。予定日 <code>D</code> の状態は:</p>
@@ -459,13 +409,13 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>月・水は通い、金を落とした(その日終了まで RECORDED なし)→ 金で途切れ <strong>連続 0</strong>、次に通った予定日から <strong>連続 1</strong></li>
 <li>予定日でない火曜に行って記録 → 連続は変わらず(ボーナス)</li>
 </ul>
-<h3 id="7-2-トロフィー-シーズン制ランク">7.2 トロフィー(シーズン制ランク)</h3>
+<h3 id="6-2-トロフィー-シーズン制ランク">6.2 トロフィー(シーズン制ランク)</h3>
 <blockquote>
-<p><strong>⚠ 本節の詳細(閾値・頻度別の到達上限・シーズンの期間と境界)は暫定で、後日確定する(§9)。</strong> 骨子=「シーズン制・6 段階・昇格のみ・年次リセット」は合意済み。以下の数値は方向性を示す提案。</p>
+<p><strong>⚠ 本節の詳細(閾値・頻度別の到達上限・シーズンの期間と境界)は暫定で、後日確定する(§8)。</strong> 骨子=「シーズン制・6 段階・昇格のみ・年次リセット」は合意済み。以下の数値は方向性を示す提案。</p>
 </blockquote>
 <p>ゲームのシーズンランクのように、<strong>連続カウントの最高到達でランクが上がり、シーズン中は下がらない</strong>(昇格のみ・降格なし)。シーズン(既定 1 年)が替わるとリセットし、新シーズンを始める。</p>
 <h4>ランク(6 段階)</h4>
-<p>連続(§7.1)の<strong>シーズン内最高値</strong> <code>seasonBestStreak</code> が閾値に達するとそのランクへ昇格する。</p>
+<p>連続(§6.1)の<strong>シーズン内最高値</strong> <code>seasonBestStreak</code> が閾値に達するとそのランクへ昇格する。</p>
 <table>
 <thead>
 <tr>
@@ -545,19 +495,19 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <li>シーズン = <strong>既定 1 年</strong>(カレンダー年)。<code>UserStats.seasonStartedAt</code> で管理(運用で期間変更可)</li>
 <li>連続が伸びるたび <code>seasonBestStreak = max(seasonBestStreak, currentStreak)</code> を更新 → ランクは上がるのみ</li>
 <li>**シーズン境界(年次 cron)**で <code>seasonBestStreak</code> と <code>currentRank</code> をリセットし、終了シーズンの最高ランクを <code>Trophy</code>(履歴)に記録する</li>
-<li>日々の未達による連続リセット(§7.4)は<strong>ランクを下げない</strong>。ランクはあくまでシーズン内ベストで決まる</li>
+<li>日々の未達による連続リセット(§6.4)は<strong>ランクを下げない</strong>。ランクはあくまでシーズン内ベストで決まる</li>
 </ul>
-<h3 id="7-3-成長グラフ">7.3 成長グラフ</h3>
+<h3 id="6-3-成長グラフ">6.3 成長グラフ</h3>
 <ul>
 <li>記録回数の推移(週次/月次)を可視化し、「自分の成長具合が一目で見える」を満たす</li>
 </ul>
-<h3 id="7-4-ペナルティ-連続のリセット">7.4 ペナルティ(連続のリセット)</h3>
-<p>サボりの痛みは<strong>連続カウントのリセットに閉じる</strong>。<strong>トロフィーの降格は行わない</strong>(シーズン制 §7.2。チームへの通知も持たない / 対象外は <a href="01_concept.html">01</a> §7.3)。</p>
+<h3 id="6-4-ペナルティ-連続のリセット">6.4 ペナルティ(連続のリセット)</h3>
+<p>サボりの痛みは<strong>連続カウントのリセットに閉じる</strong>。<strong>トロフィーの降格は行わない</strong>(シーズン制 §6.2。チームへの通知も持たない / 対象外は <a href="01_concept.html">01</a> §7.3)。</p>
 <ul>
-<li><strong>連続カウント途切れ</strong>: 予定日の<strong>未達</strong>(その日終了まで RECORDED なし、または SKIPPED)で連続が 0 に戻る(算出は §7.1)</li>
-<li>一度上げたトロフィーランクはシーズン中は下がらない。リセットは<strong>シーズン境界(年次)のみ</strong>(§7.2)</li>
+<li><strong>連続カウント途切れ</strong>: 予定日の<strong>未達</strong>(その日終了まで RECORDED なし、または SKIPPED)で連続が 0 に戻る(算出は §6.1)</li>
+<li>一度上げたトロフィーランクはシーズン中は下がらない。リセットは<strong>シーズン境界(年次)のみ</strong>(§6.2)</li>
 </ul>
-<h3 id="7-5-エンドポイント">7.5 エンドポイント</h3>
+<h3 id="6-5-エンドポイント">6.5 エンドポイント</h3>
 <p>ランクは<strong>ユーザーに紐づく独立リソース</strong> <code>rank</code> として扱う。自分・チーム・(将来の)全国ランキングを同じ土台から引けるようにするため、<code>/account</code> 配下に閉じない。</p>
 <table>
 <thead>
@@ -580,23 +530,23 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tbody></table>
 <blockquote>
 <p>自分のランクは自分の <code>userId</code>(<code>/account</code> で取得済み)で引く。専用の <code>/rank/me</code> は持たない。
-ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§8.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
+ランクの真実は <code>UserStats</code>(ユーザー単位の <code>currentRank</code> / <code>seasonBestStreak</code>)+ <code>Trophy</code>(シーズン履歴)。<strong>チーム内ランキング</strong>(§7.3 <code>/teams/:id/ranking</code>)や<strong>全国ランキング</strong>(2nd, <a href="01_concept.html">01</a> §7.3)は、このユーザー紐づきランクを<strong>集約</strong>して構成する。</p>
 </blockquote>
 <hr>
-<h2 id="8-f06-チーム">8. F06 チーム</h2>
-<h3 id="8-1-要件">8.1 要件</h3>
+<h2 id="7-f06-チーム">7. F06 チーム</h2>
+<h3 id="7-1-要件">7.1 要件</h3>
 <p>一人にしない。チームで進捗を共有し、<strong>チーム内ランキング</strong>で励む。</p>
 <ul>
 <li>チーム作成(作成者がオーナー)、招待コード or リンクで参加</li>
 <li>メンバーの<strong>進捗が見える</strong>(直近の記録状況・連続カウント)</li>
-<li><strong>チーム内ランキング</strong>(指標は連続カウント / 期間内記録数 / ランク のいずれか。既定は §9 で確定)。メンバーのユーザー紐づきランク(§7.5)を集約して構成</li>
+<li><strong>チーム内ランキング</strong>(指標は連続カウント / 期間内記録数 / ランク のいずれか。既定は §8 で確定)。メンバーのユーザー紐づきランク(§6.5)を集約して構成</li>
 <li>ランキングは<strong>チーム内のみ</strong>(対象外は <a href="01_concept.html">01</a> §7.3)</li>
 </ul>
-<h3 id="8-2-プライバシー">8.2 プライバシー</h3>
+<h3 id="7-2-プライバシー">7.2 プライバシー</h3>
 <ul>
 <li>共有するのは記録の有無・回数・連続など<strong>進捗系のみ</strong>。記録メモ等の詳細は共有しない(MVP)</li>
 </ul>
-<h3 id="8-3-エンドポイント">8.3 エンドポイント</h3>
+<h3 id="7-3-エンドポイント">7.3 エンドポイント</h3>
 <table>
 <thead>
 <tr>
@@ -632,14 +582,14 @@ body{margin:0;background:var(--paper);color:var(--ink);
 </tr>
 </tbody></table>
 <hr>
-<h2 id="9-未確定事項">9. 未確定事項</h2>
+<h2 id="8-未確定事項">8. 未確定事項</h2>
 <p>実装着手前に確定し、本書と関連節を更新する。</p>
 <ul>
-<li><strong>トロフィー(ランク)の詳細</strong>(§7.2)— <strong>後日決定</strong>。骨子(シーズン制・6 段階・昇格のみ・年次リセット)は合意済み。<strong>閾値・頻度別の到達上限・シーズンの期間と境界</strong>は未定</li>
-<li>ランキング指標の既定(連続 / 期間内記録数 / ランク)(§8.1)</li>
+<li><strong>トロフィー(ランク)の詳細</strong>(§6.2)— <strong>後日決定</strong>。骨子(シーズン制・6 段階・昇格のみ・年次リセット)は合意済み。<strong>閾値・頻度別の到達上限・シーズンの期間と境界</strong>は未定</li>
+<li>ランキング指標の既定(連続 / 期間内記録数 / ランク)(§7.1)</li>
 </ul>
 <blockquote>
-<p>連続カウント(§7.1)のロジックは<strong>確定済み</strong>。トロフィー(§7.2)は骨子のみ合意で、詳細は後日確定。</p>
+<p>連続カウント(§6.1)のロジックは<strong>確定済み</strong>。トロフィー(§6.2)は骨子のみ合意で、詳細は後日確定。</p>
 </blockquote>
 
         <nav class="pager"><a href="01_concept.html"><div class="dir">← PREV</div><div class="t">01 コンセプト</div></a><a href="03_database_design.html" class="next"><div class="dir">NEXT →</div><div class="t">03 DB設計</div></a></nav>
@@ -663,26 +613,22 @@ body{margin:0;background:var(--paper);color:var(--ink);
 <a href="#4-2-データと予定日-オカレンス" class="toc-l3">4.2 データと予定日(オカレンス)</a>
 <a href="#4-3-エンドポイント" class="toc-l3">4.3 エンドポイント</a>
 <a href="#4-4-リマインド配信" class="toc-l3">4.4 リマインド配信</a>
-<a href="#5-f02-準備チェックリスト" class="toc-l2">5. F02 準備チェックリスト</a>
+<a href="#5-f03-記録-行った証明" class="toc-l2">5. F03 記録(行った証明)</a>
 <a href="#5-1-要件" class="toc-l3">5.1 要件</a>
-<a href="#5-2-データモデルの考え方" class="toc-l3">5.2 データモデルの考え方</a>
-<a href="#5-3-エンドポイント" class="toc-l3">5.3 エンドポイント</a>
-<a href="#6-f03-記録-行った証明" class="toc-l2">6. F03 記録(行った証明)</a>
-<a href="#6-1-要件" class="toc-l3">6.1 要件</a>
-<a href="#6-2-状態遷移" class="toc-l3">6.2 状態遷移</a>
-<a href="#6-3-記録の内容-mvp" class="toc-l3">6.3 記録の内容(MVP)</a>
-<a href="#6-4-エンドポイント" class="toc-l3">6.4 エンドポイント</a>
-<a href="#7-f04-報酬・ペナルティ-積み重ねの増減" class="toc-l2">7. F04 報酬・ペナルティ(積み重ねの増減)</a>
-<a href="#7-1-連続カウント-ストリーク" class="toc-l3">7.1 連続カウント(ストリーク)</a>
-<a href="#7-2-トロフィー-シーズン制ランク" class="toc-l3">7.2 トロフィー(シーズン制ランク)</a>
-<a href="#7-3-成長グラフ" class="toc-l3">7.3 成長グラフ</a>
-<a href="#7-4-ペナルティ-連続のリセット" class="toc-l3">7.4 ペナルティ(連続のリセット)</a>
-<a href="#7-5-エンドポイント" class="toc-l3">7.5 エンドポイント</a>
-<a href="#8-f06-チーム" class="toc-l2">8. F06 チーム</a>
-<a href="#8-1-要件" class="toc-l3">8.1 要件</a>
-<a href="#8-2-プライバシー" class="toc-l3">8.2 プライバシー</a>
-<a href="#8-3-エンドポイント" class="toc-l3">8.3 エンドポイント</a>
-<a href="#9-未確定事項" class="toc-l2">9. 未確定事項</a>
+<a href="#5-2-状態遷移" class="toc-l3">5.2 状態遷移</a>
+<a href="#5-3-記録の内容-mvp" class="toc-l3">5.3 記録の内容(MVP)</a>
+<a href="#5-4-エンドポイント" class="toc-l3">5.4 エンドポイント</a>
+<a href="#6-f04-報酬・ペナルティ-積み重ねの増減" class="toc-l2">6. F04 報酬・ペナルティ(積み重ねの増減)</a>
+<a href="#6-1-連続カウント-ストリーク" class="toc-l3">6.1 連続カウント(ストリーク)</a>
+<a href="#6-2-トロフィー-シーズン制ランク" class="toc-l3">6.2 トロフィー(シーズン制ランク)</a>
+<a href="#6-3-成長グラフ" class="toc-l3">6.3 成長グラフ</a>
+<a href="#6-4-ペナルティ-連続のリセット" class="toc-l3">6.4 ペナルティ(連続のリセット)</a>
+<a href="#6-5-エンドポイント" class="toc-l3">6.5 エンドポイント</a>
+<a href="#7-f06-チーム" class="toc-l2">7. F06 チーム</a>
+<a href="#7-1-要件" class="toc-l3">7.1 要件</a>
+<a href="#7-2-プライバシー" class="toc-l3">7.2 プライバシー</a>
+<a href="#7-3-エンドポイント" class="toc-l3">7.3 エンドポイント</a>
+<a href="#8-未確定事項" class="toc-l2">8. 未確定事項</a>
       </aside>
     </div>
   </div>

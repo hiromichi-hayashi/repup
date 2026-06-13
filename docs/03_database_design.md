@@ -22,8 +22,7 @@
 ## 2. ER 概要
 
 ```
-User 1──n Schedule 1──1 Checklist 1──n ChecklistItem
-User 1──n ChecklistTemplateItem
+User 1──n Schedule
 User 1──n Record
 User 1──1 UserStats
 User 1──n Trophy
@@ -65,7 +64,7 @@ Expo Push トークン(端末ごと)。
 
 ### 3.3 Schedule(F01)
 
-通う日(= 行く予定)。単発・繰り返しを表現し、**予定日(オカレンス)を生成する基準**。リマインドと連続カウント(F04 §7.1)の両方がこの予定日に依存する。
+通う日(= 行く予定)。単発・繰り返しを表現し、**予定日(オカレンス)を生成する基準**。リマインドと連続カウント(F04 §6.1)の両方がこの予定日に依存する。
 
 | カラム | 型 | 制約 | 説明 |
 |---|---|---|---|
@@ -90,41 +89,7 @@ Expo Push トークン(端末ごと)。
 
 > 単発は `date`、繰り返しは `recurrenceRule`(+ interval≥2 は `startDate`)を持つ。アプリ/cron は指定期間に対して**予定日の集合**を生成し、`Record`(達成判定)・リマインド・連続カウントの基準にする。
 
-### 3.4 ChecklistTemplateItem(F02)
-
-ユーザーごとの準備項目テンプレート(再利用される定義)。
-
-| カラム | 型 | 制約 | 説明 |
-|---|---|---|---|
-| id | text | PK | |
-| userId | text | FK→User | |
-| label | text | | 例: タオル / コワーキング予約済み? |
-| sortOrder | int | | 表示順 |
-| active | boolean | default true | |
-
-### 3.5 Checklist(F02)
-
-特定の予定に対するチェックリスト実体。
-
-| カラム | 型 | 制約 | 説明 |
-|---|---|---|---|
-| id | text | PK | |
-| scheduleId | text | FK→Schedule, unique | 1 予定 1 チェックリスト |
-| createdAt | timestamptz | default now | |
-
-### 3.6 ChecklistItem(F02)
-
-チェックリストの各項目(テンプレートから複製、状態を持つ)。
-
-| カラム | 型 | 制約 | 説明 |
-|---|---|---|---|
-| id | text | PK | |
-| checklistId | text | FK→Checklist | |
-| label | text | | 複製時点のラベル |
-| checked | boolean | default false | |
-| checkedAt | timestamptz | null可 | |
-
-### 3.7 Record(F03)
+### 3.4 Record(F03)
 
 その日の確定状態。RECORDED / SKIPPED を保持(BLANK はレコード不在で表す)。
 
@@ -144,7 +109,7 @@ Expo Push トークン(端末ごと)。
 
 > 状態遷移の定義は [02 機能設計](02_function_design.html) §F03 を参照。
 
-### 3.8 UserStats(F04)
+### 3.5 UserStats(F04)
 
 集計のキャッシュ(導出値)。リアルタイム算出が重い場合の高速化用。
 
@@ -159,9 +124,9 @@ Expo Push トークン(端末ごと)。
 | totalRecords | int | default 0 | 累積記録数 |
 | updatedAt | timestamptz | | |
 
-> UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群 + Schedule。ランクは**昇格のみ**、シーズン境界(年次 cron)で `seasonBestStreak` / `currentRank` をリセット([02](02_function_design.html) §7.2)。
+> UserStats は Record 確定時 / cron 評価時に更新する派生データ。真実は Record 群 + Schedule。ランクは**昇格のみ**、シーズン境界(年次 cron)で `seasonBestStreak` / `currentRank` をリセット([02](02_function_design.html) §6.2)。
 
-### 3.9 Trophy(F04)
+### 3.6 Trophy(F04)
 
 **シーズンごとの最高ランク履歴**(過去シーズンの実績)。降格による失効は持たない。
 
@@ -175,7 +140,7 @@ Expo Push トークン(端末ごと)。
 
 制約: `(userId, season, rank)` で一意(同一シーズン・同一ランクは 1 行)。シーズンの最高ランク = 当該 season の最大 rank。
 
-### 3.10 Team(F06)
+### 3.7 Team(F06)
 
 | カラム | 型 | 制約 | 説明 |
 |---|---|---|---|
@@ -185,7 +150,7 @@ Expo Push トークン(端末ごと)。
 | inviteCode | text | unique | 招待コード |
 | createdAt | timestamptz | default now | |
 
-### 3.11 Membership(F06)
+### 3.8 Membership(F06)
 
 User と Team の中間。進捗共有の単位。
 
@@ -199,7 +164,7 @@ User と Team の中間。進捗共有の単位。
 
 制約: `(teamId, userId)` で一意。
 
-### 3.12 NotificationLog(通知の冪等性)
+### 3.9 NotificationLog(通知の冪等性)
 
 プッシュ通知の二重送信を防ぐ送信記録。定義・用途は [06 通知設計](06_notification_design.html) §5 に対応。
 
@@ -208,7 +173,7 @@ User と Team の中間。進捗共有の単位。
 | id | text | PK | |
 | userId | text | FK→User | |
 | scheduleId | text | FK→Schedule, null可 | |
-| type | enum | | N01/N02/N03/N04 |
+| type | enum | | N01/N02/N03 |
 | targetDate | date | | 対象日 |
 | sentAt | timestamptz | default now | 送信日時 |
 
@@ -235,7 +200,6 @@ model User {
   updatedAt        DateTime @updatedAt
   schedules        Schedule[]
   records          Record[]
-  templateItems    ChecklistTemplateItem[]
   memberships      Membership[]
   trophies         Trophy[]
   stats            UserStats?
